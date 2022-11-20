@@ -36,6 +36,6 @@ module.exports = {
             .setTitle(":rotating_light: Urgent Request :rotating_light:")
             .addFields({name: "Details:", value: message}, {name: "Additional Info:", value: (info ?? "None")});
         var channel = await interaction.client.channels.fetch("1027780828794732574");
-        channel.send({embeds: [update]});
+        channel.send({content: "<@&1027782166811254805>", embeds: [update]});
 	},
 };

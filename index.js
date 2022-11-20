@@ -48,7 +48,7 @@ var j;
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, c => {
-	j = schedule.scheduleJob({hour: 9, minute: 20}, async function() {
+	j = schedule.scheduleJob({hour: 23, minute: 0}, async function() {
 		var channel = await client.channels.fetch("1027780828794732574");
 		var update = client.commands.get("writeupdate").getUpdateContent();
 		if(update != false) {
