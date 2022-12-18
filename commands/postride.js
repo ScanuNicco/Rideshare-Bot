@@ -27,11 +27,14 @@ module.exports = {
 				.setDescription('Are you expecting/offering payment to cover your share of gas/parking?'))
 		.addStringOption(option =>
 			option.setName('additional-info')
-				.setDescription('Anything else you want to add.')),
+				.setDescription('Anything else you want to add.'))
+		.addUserOption(option =>
+                        option.setName('user')
+                                .setDescription('Create this request on behalf of another user. Please do not abuse this or it will be removed.')),
 	async execute(interaction) {
 		var rides = JSON.parse(localStorage.getItem('rides')) ?? [];
 		var requests = JSON.parse(localStorage.getItem('requests')) ?? [];
-		const target = interaction.user;
+		const target = interaction.options.getUser('user') ?? interaction.user;
 		const offering = interaction.options.getString('type') == "offering";
 		const dest = interaction.options.getString('where');
 		const when = interaction.options.getString('when');

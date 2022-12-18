@@ -22,18 +22,19 @@ function writeUpdate() {
     var now = new Date();
     const update = new EmbedBuilder()
         .setColor(0x0099FF)
-        .setTitle("Daily Update " + now.getMonth() + "/" + now.getDate() + "/" + now.getFullYear())
+        .setTitle("Daily Update " + (now.getMonth() + 1) + "/" + now.getDate() + "/" + now.getFullYear())
         .setFooter({text: "Daily updates are always sent at 11:00pm"});
 	var rides = JSON.parse(localStorage.getItem('rides')) ?? [];
     var requests = JSON.parse(localStorage.getItem('requests')) ?? [];
     //console.log(rides);
     //console.log(requests);
+	const HOURS_24 = 24*60*60*1000;
 	var ridesText = "";
 	for(var i = 0; i < rides.length; i++){
 		ride = rides[i];
-        console.log("Time passed: " + (now.getTime() - ride.timestamp));
-		if(now.getTime() - ride.timestamp < 24*60*60*1000) {
-			ridesText += ride.user.username + " is offering a ride to `" + ride.dest + "` on `" + ride.when + "`. More info: " + hyperlink("here", `https://discord.com/channels/${ride.message.guildId}/${ride.message.channelId}/${ride.message.id}`, "here") + "\n";
+        //console.log("Time passed: " + (now.getTime() - ride.timestamp));
+		if(now.getTime() - ride.timestamp < HOURS_24) {
+			ridesText += ride.user.username + " is offering a ride to `" + ride.dest + "` on `" + ride.when + "`. " + hyperlink("More Info", `https://discord.com/channels/${ride.message.guildId}/${ride.message.channelId}/${ride.message.id}`, "here") + "\n";
 		}
 	}
 	if(ridesText != "") {
@@ -42,9 +43,9 @@ function writeUpdate() {
 	var requestsText = "";
 	for(var i = 0; i < requests.length; i++){
 		ride = requests[i];
-        console.log("Time passed: " + (now.getTime() - ride.timestamp));
-		if(now.getTime() - ride.timestamp < 24*60*60*100) {
-			requestsText += ride.user.username + " is looking for a ride to `" + ride.dest + "` on `" + ride.when + "`. More info: " + hyperlink("here", `https://discord.com/channels/${ride.message.guildId}/${ride.message.channelId}/${ride.message.id}`, "here") + "\n";
+        //console.log("Time passed: " + (now.getTime() - ride.timestamp));
+		if(now.getTime() - ride.timestamp < HOURS_24) {
+			requestsText += ride.user.username + " is looking for a ride to `" + ride.dest + "` on `" + ride.when + "`. " + hyperlink("More Info", `https://discord.com/channels/${ride.message.guildId}/${ride.message.channelId}/${ride.message.id}`, "here") + "\n";
 		}
 	}
     if(requestsText != "") {
