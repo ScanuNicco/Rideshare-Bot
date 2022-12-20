@@ -6,7 +6,7 @@ const path = require('node:path');
 var LocalStorage = require('node-localstorage').LocalStorage;
 var schedule = require('node-schedule');
 localStorage = new LocalStorage('./ridedata');
-const UPDATE_CHANNEL_ID = "1027780828794732574";
+const constants = require("./constants.js");
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -50,7 +50,7 @@ var j;
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, c => {
 	j = schedule.scheduleJob({hour: 20, minute: 0}, async function() {
-		var channel = await client.channels.fetch(UPDATE_CHANNEL_ID);
+		var channel = await client.channels.fetch(constants.UPDATE_CHANNEL_ID);
 		var update = client.commands.get("writeupdate").getUpdateContent();
 		if(update != false) {
 			//console.log("Sending daily update!");

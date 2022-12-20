@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 var LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = new LocalStorage('./ridedata');
+const constants = require("../constants.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -35,7 +36,7 @@ module.exports = {
             .setColor(0x0099FF)
             .setTitle(":rotating_light: Urgent Request :rotating_light:")
             .addFields({name: "Details:", value: message}, {name: "Additional Info:", value: (info ?? "None")});
-        var channel = await interaction.client.channels.fetch(UPDATE_CHANNEL_ID);
+        var channel = await interaction.client.channels.fetch(constants.UPDATE_CHANNEL_ID);
         channel.send({content: "<@&1027782166811254805>", embeds: [update]});
 	},
 };
