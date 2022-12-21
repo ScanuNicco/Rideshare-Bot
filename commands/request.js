@@ -14,6 +14,9 @@ module.exports = {
 			option.setName('when')
 				.setDescription('When are you going? Be sure to include the numerical date. "Thursday" is not specific enough.')
 				.setRequired(true))
+		.addStringOption(option =>
+			option.setName('whence')
+				.setDescription('Where are you leaving from? Keep this under 5 words.'))
 		.addBooleanOption(option =>
 			option.setName('payment')
 				.setDescription('Are you offering payment to cover your share of gas/parking?'))
@@ -27,13 +30,18 @@ module.exports = {
 		var requests = JSON.parse(localStorage.getItem('requests')) ?? [];
 		const target = interaction.options.getUser('user') ?? interaction.user;
 		const dest = interaction.options.getString('where');
+		const whence = interaction.options.getString('whence');
+		var whencestring = "";
+		if(whence != null && whence != undefined){
+			whencestring = "from `" + whence + "` ";
+		}
 		const when = interaction.options.getString('when');
 		const payment = interaction.options.getBoolean('payment');
 		const info = interaction.options.getString("additional-info")
 		await interaction.reply({content: "Your request has been submitted! It will be included in the today's daily update.", ephemeral: true});
-		const message = await interaction.channel.send("**" + target.username + "** is looking for a ride to `" + dest + "` on `" + when + "`. " + (payment ? "He/she is offering to help cover the cost of parking/gas. " : "") + "\n\n*Additional Info:*\n" + (info ?? "None"));
+		const message = await interaction.channel.send("**" + target.username + "** is looking for a ride " + whencestring + "to `" + dest + "` on `" + when + "`. " + (payment ? "He/she is offering to help cover the cost of parking/gas. " : "") + "\n\n*Additional Info:*\n" + (info ?? "None"));
 		//console.log(message);
-		requests.push({user: target, dest: dest, when: when, payment: payment, info: info, timestamp: Date.now(), message: message});
+		requests.push({user: target, dest: dest, whence: whence, whencestring: whencestring, when: when, payment: payment, info: info, timestamp: Date.now(), message: message});
 		localStorage.setItem('requests', JSON.stringify(requests));
 	},
 };
