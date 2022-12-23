@@ -62,5 +62,29 @@ client.once(Events.ClientReady, c => {
 	console.log(`Ready! Logged in as ${c.user.tag}`);
 });
 
+/* Handle button interactions */
+client.on(Events.InteractionCreate, async function(interaction) {
+	if (!interaction.isButton()) return;
+	//console.log(interaction);
+	if(interaction.customId == 'cancelReq' || interaction.customId == "foundRide") { //The user clicked a cancel request button
+		var requests = JSON.parse(localStorage.getItem('requests')) ?? [];
+		var panelID = interaction.message.id;
+		const req = requests[panelID];
+		if(req.deleted !== true){
+			req.deleted = true;
+			const channel = client.channels.cache.get(req.message.channelId);
+			const message = await channel.messages.fetch(req.message.id);
+			if(interaction.customId == "foundRide") {
+				message.edit("~~ " + req.message.content + " ~~\n\n**Good News!** " + req.user.username + " found a ride.");
+			} else {
+				message.edit("**" + req.user.username + "** has cancelled their request for a ride to `" + req.dest + "`");
+			}
+			interaction.reply({content: 'Request updated.', ephemeral: true});
+		} else {
+			interaction.reply({content: 'ERROR: Request has already been cancelled', ephemeral: true});
+		}
+	}
+});
+
 // Log in to Discord with your client's token
 client.login(token);

@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Events } = require('discord.js');
 var LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = new LocalStorage('./ridedata');
 
@@ -41,7 +41,22 @@ module.exports = {
 		await interaction.reply({content: "Your request has been submitted! It will be included in the today's daily update.", ephemeral: true});
 		const message = await interaction.channel.send("**" + target.username + "** is looking for a ride " + whencestring + "to `" + dest + "` on `" + when + "`. " + (payment ? "He/she is offering to help cover the cost of parking/gas. " : "") + "\n\n*Additional Info:*\n" + (info ?? "None"));
 		//console.log(message);
-		requests.push({user: target, dest: dest, whence: whence, whencestring: whencestring, when: when, payment: payment, info: info, timestamp: Date.now(), message: message});
+		const userDM = await target.createDM();
+		const row = new ActionRowBuilder()
+			.addComponents(
+				new ButtonBuilder()
+					.setCustomId('foundRide')
+					.setLabel('I Found a Ride!')
+					.setStyle(ButtonStyle.Primary),
+				new ButtonBuilder()
+					.setCustomId('cancelReq')
+					.setLabel('Cancel this Request')
+					.setStyle(ButtonStyle.Danger),
+			);
+		const controls = await userDM.send({content: "**Handy Control Panel:** Ride request for `" + dest + "`", components: [row]});
+		console.log(controls.id);
+		requests[controls.id] = {user: target, dest: dest, whence: whence, whencestring: whencestring, when: when, payment: payment, info: info, timestamp: Date.now(), message: message};
 		localStorage.setItem('requests', JSON.stringify(requests));
+
 	},
 };
