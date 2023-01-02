@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 var LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = new LocalStorage('./ridedata');
+const constants = require("../constants.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -21,21 +22,19 @@ module.exports = {
 			option.setName('additional-info')
 				.setDescription('Anything else you want to add.')),
 	async execute(interaction) {
-		var rides = JSON.parse(localStorage.getItem('rides')) ?? [];
 		var requests = JSON.parse(localStorage.getItem('requests')) ?? [];
 		const target = interaction.user;
-		const offering = interaction.options.getString('type') == "offering";
 		const dest = interaction.options.getString('where');
 		const when = interaction.options.getString('when');
 		const payment = interaction.options.getBoolean('payment');
 		const info = interaction.options.getString("additional-info")
-		await interaction.reply({content: "Your " + (offering ? "offer" : "request") + " has been submitted! Check #daily-updates", ephemeral: true});
-		const message = "**" + target.username + "** is desperately looking for a ride to `" + dest + "` on `" + when + "`. " + (payment ? "He/she is " + (offering ? "requesting that you" : "offering to") + " help cover the cost of parking/gas. " : "");
+		await interaction.reply({content: "Your urgent request has been submitted! Check #daily-updates\n\nEmergency requests are currenlty separate from regular requests, and cannot be edited at this time.", ephemeral: true});
+		const message = "**" + target.username + "** is desperately looking for a ride to `" + dest + "` on `" + when + "`. " + (payment ? "He/she is offering to help cover the cost of parking/gas. " : "");
 		const update = new EmbedBuilder()
             .setColor(0x0099FF)
             .setTitle(":rotating_light: Urgent Request :rotating_light:")
             .addFields({name: "Details:", value: message}, {name: "Additional Info:", value: (info ?? "None")});
-        var channel = await interaction.client.channels.fetch(UPDATE_CHANNEL_ID);
+        var channel = await interaction.client.channels.fetch(constants.UPDATE_CHANNEL_ID);
         channel.send({content: "<@&1027782166811254805>", embeds: [update]});
 	},
 };

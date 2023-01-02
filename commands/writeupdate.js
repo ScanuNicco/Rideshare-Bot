@@ -33,8 +33,8 @@ function writeUpdate() {
 	for(var i = 0; i < rides.length; i++){
 		ride = rides[i];
         //console.log("Time passed: " + (now.getTime() - ride.timestamp));
-		if(now.getTime() - ride.timestamp < HOURS_24) {
-			ridesText += ride.user.username + " is offering a ride to `" + ride.dest + "` on `" + ride.when + "`. " + hyperlink("More Info", `https://discord.com/channels/${ride.message.guildId}/${ride.message.channelId}/${ride.message.id}`, "here") + "\n";
+		if(now.getTime() - ride.timestamp < HOURS_24 && ride.deleted !== true) {
+			ridesText += ride.user.username + " is offering a ride " + ride.whencestring + "to `" + ride.dest + "` on `" + ride.when + "`. " + hyperlink("More Info", `https://discord.com/channels/${ride.message.guildId}/${ride.message.channelId}/${ride.message.id}`, "here") + "\n";
 		}
 	}
 	if(ridesText != "") {
@@ -44,8 +44,8 @@ function writeUpdate() {
 	for(var i = 0; i < requests.length; i++){
 		ride = requests[i];
         //console.log("Time passed: " + (now.getTime() - ride.timestamp));
-		if(now.getTime() - ride.timestamp < HOURS_24) {
-			requestsText += ride.user.username + " is looking for a ride to `" + ride.dest + "` on `" + ride.when + "`. " + hyperlink("More Info", `https://discord.com/channels/${ride.message.guildId}/${ride.message.channelId}/${ride.message.id}`, "here") + "\n";
+		if(now.getTime() - ride.timestamp < HOURS_24 && ride.deleted !== true) {
+			requestsText += ride.user.username + " is looking for a ride " + ride.whencestring + "to `" + ride.dest + "` on `" + ride.when + "`. " + hyperlink("More Info", `https://discord.com/channels/${ride.message.guildId}/${ride.message.channelId}/${ride.message.id}`, "here") + "\n";
 		}
 	}
     if(requestsText != "") {
