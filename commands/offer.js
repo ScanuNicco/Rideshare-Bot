@@ -1,12 +1,12 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Events } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Events, ModalBuilder, TextInputBuilder, TextInputStyle, StringSelectMenuBuilder } = require('discord.js');
 var LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = new LocalStorage('./ridedata');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('offer')
-		.setDescription('Offer a ride')
-		.addStringOption(option =>
+		.setDescription('Offer a ride'),
+		/*.addStringOption(option =>
 			option.setName('where')
 				.setDescription('Where are you going? Keep this under 5 words.')
 				.setRequired(true))
@@ -25,8 +25,62 @@ module.exports = {
 				.setDescription('Anything else you want to add.'))
 		.addUserOption(option =>
 			option.setName('user')
-				.setDescription('Create this offer on behalf of another user. Please do not abuse this or it will be removed.')),
+				.setDescription('Create this offer on behalf of another user. Please do not abuse this or it will be removed.')),*/
 	async execute(interaction) {
+		const modal = new ModalBuilder()
+			.setCustomId('offerModal')
+			.setTitle('Offer A Ride');
+
+		const whenceInput = new TextInputBuilder({
+			custom_id: 'whenceInput',
+			label: 'Whence',
+			placeholder: 'Where are you leaving from? (Optional)',
+			required: false,
+			style: TextInputStyle.Short,
+		});
+
+		const ar1 = new ActionRowBuilder().addComponents(whenceInput);
+
+		const whereInput = new TextInputBuilder({
+			custom_id: 'whereInput',
+			label: 'Where',
+			placeholder: 'Where are you headed?',
+			style: TextInputStyle.Short,
+		});
+
+		const ar2 = new ActionRowBuilder().addComponents(whereInput);
+
+		const infoInput = new TextInputBuilder({
+			custom_id: 'infoInput',
+			label: 'Additional Info',
+			placeholder: 'Anything else you want to add? (Optional)',
+			required: false,
+			style: TextInputStyle.Paragraph
+		});
+
+		const ar3 = new ActionRowBuilder().addComponents(infoInput);
+
+		const paymentMenu = new StringSelectMenuBuilder({
+			custom_id: 'paymentMenu',
+			placeholder: 'Select an Option',
+			max_values: 1,
+			options: [
+				{ label: 'Yes', value: 'yes' },
+				{ label: 'No', value: 'no' },
+			],
+		});
+
+		const ar4 = new ActionRowBuilder().addComponents(paymentMenu);
+
+		// Add inputs to the modal
+		modal.addComponents(ar1);
+		modal.addComponents(ar2);
+		modal.addComponents(ar4);
+		modal.addComponents(ar3);
+
+		interaction.showModal(modal);
+
+		return;
 		var rides = JSON.parse(localStorage.getItem('rides')) ?? [];
 		const target = interaction.options.getUser('user') ?? interaction.user;
 		const dest = interaction.options.getString('where');
