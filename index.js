@@ -72,7 +72,7 @@ client.on(Events.InteractionCreate, async function(interaction) {
 	if(interaction.customId == 'cancelReq') { //The user clicked a cancel button
 		if(rdEvt.deleted !== true){
 			rdEvt.deleted = true;
-			await replaceWithStatus(rdEvt, `**${rdEvt.user.username}** has cancelled their request for a ride to \`${rdEvt.dest}\`.`);
+			await replaceWithStatus(rdEvt, `**${rdEvt.target.username}** has cancelled their request for a ride to \`${rdEvt.dest}\`.`);
 			interaction.reply({content: 'Request cancelled. Please be sure to inform anyone who offered you a ride!', ephemeral: true});
 		} else {
 			interaction.reply({content: 'ERROR: Request has already been cancelled', ephemeral: true});
@@ -80,7 +80,7 @@ client.on(Events.InteractionCreate, async function(interaction) {
 	} else if (interaction.customId == "foundRide"){
 		if(rdEvt.deleted !== true){
 			rdEvt.deleted = true;
-			await appendStatus(rdEvt, `**Good News!** ${rdEvt.user.username} found a ride.`, true);
+			await appendStatus(rdEvt, `**Good News!** ${rdEvt.target.username} found a ride.`, true);
 			interaction.reply({content: 'Awesome news! I\'m thrilled that I was able to help you get to your destination.', ephemeral: true});
 		} else {
 			interaction.reply({content: 'ERROR: Request has already been cancelled', ephemeral: true});
@@ -88,7 +88,7 @@ client.on(Events.InteractionCreate, async function(interaction) {
 	} else if(interaction.customId == 'cancelOff') { //The user clicked a cancel button
 		if(rdEvt.deleted !== true){
 			rdEvt.deleted = true;
-			await replaceWithStatus(rdEvt, `**${rdEvt.user.username}** has cancelled their ride offer to \`${rdEvt.dest}\`.`);
+			await replaceWithStatus(rdEvt, `**${rdEvt.target.username}** has cancelled their ride offer to \`${rdEvt.dest}\`.`);
 			interaction.reply({content: 'Ride offer cancelled. Please be sure to inform anyone who was planning to ride with you!', ephemeral: true});
 		} else {
 			interaction.reply({content: 'ERROR: Request has already been cancelled', ephemeral: true});
