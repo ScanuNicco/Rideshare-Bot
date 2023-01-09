@@ -1,32 +1,4 @@
 const { SlashCommandBuilder } = require('discord.js');
-/*
-exports.buildBaseRideEvent = function(name, description){
-    const command = new SlashCommandBuilder()
-		.setName('offer')
-		.setDescription('Offer a ride')
-		.addStringOption(option =>
-			option.setName('where')
-				.setDescription('Where are you going? Keep this under 5 words.')
-				.setRequired(true))
-		.addStringOption(option =>
-			option.setName('when')
-				.setDescription('When are you going? Be sure to include the numerical date. "Thursday" is not specific enough.')
-				.setRequired(true))
-		.addStringOption(option =>
-			option.setName('whence')
-				.setDescription('Where are you leaving from? Keep this under 5 words.'))
-		.addBooleanOption(option =>
-			option.setName('payment')
-				.setDescription(`Are you ${name == 'offer' ? 'expecting' : 'offering'} payment to help cover the cost of gas/parking?`))
-		.addStringOption(option =>
-			option.setName('additional-info')
-				.setDescription('Anything else you want to add.'))
-		.addUserOption(option =>
-			option.setName('user')
-				.setDescription(`Create this ${name} on behalf of another user. Please do not abuse this or it will be removed.`));
-        return command;
-}*/
-
 
 class RideCommandBuilder extends SlashCommandBuilder {
 
@@ -67,6 +39,7 @@ class RideEvent {
     constructor() {
         //The static methods handle object creation because JavaScript can't do constructor overloading
         this.timestamp = Date.now();
+        this.deleted = false;
     }
 
     async fromInteraction(interaction) {
@@ -92,10 +65,32 @@ class RideEvent {
         this.when = obj.when;
         this.payment = obj.payment;
         this.info = obj.info;
+        this.message = obj.message; //This is a Data Object, not the actual Message object that has functions and stuff. Use getMessageFromRideEvent() for that.
     }
 
     writeMessageText() {
         return "Placeholder RideEvent message.";
+    }
+
+    async getMessageFromRideEvent(client) {
+        const channel = client.channels.cache.get(this.message.channelId);
+        const message = await channel.messages.fetch(this.message.id);
+        return message;
+    }
+
+    async replaceWithStatus(client, status) {
+        const message = await this.getMessageFromRideEvent(client);
+        message.edit(status);
+    }
+
+    async appendStatus(client, status, strikethrough) {
+        const message = await this.getMessageFromRideEvent(client);
+        var strkString = strikethrough ? "~~" : "";
+        message.edit(`${strkString}${this.message.content}${strkString}\n\n**Status:**\n> ${status}`);
+    }
+
+    async cancel(client, interaction) {
+        this.deleted = true;
     }
 }
 
@@ -115,6 +110,12 @@ class Offer extends RideEvent {
         const message = `**${this.target.username}** is offering a ride ${this.whencestring}to \`${this.dest}\` on \`${this.when}\`.${(this.payment ? "He/she is requesting that you help cover the cost of parking/gas. " : "")}\n\nVehicle Info:\n${this.vehicleInfo}\n\n*Additional Info:*\n${(this.info ?? "None")}`;
         return message;
     }
+
+    async cancel(client, interaction) {
+        super.cancel(interaction);
+        await this.replaceWithStatus(client, `**${this.target.username}** has cancelled their ride offer to \`${this.dest}\`.`);
+        interaction.reply({content: 'Ride offer cancelled. Please be sure to inform anyone who was planning to ride with you!', ephemeral: true});
+    }
 }
 
 class Request extends RideEvent {
@@ -126,6 +127,12 @@ class Request extends RideEvent {
     writeMessageText() {
         const message = `**${this.target.username}** is looking for a ride ${this.whencestring}to \`${this.dest}\` on \`${this.when}\`.${(this.payment ? "He/she is offering to help cover the cost of parking/gas. " : "")}\n\n*Additional Info:*\n${(this.info ?? "None")}`;
         return message;
+    }
+
+    async cancel(client, interaction) {
+        super.cancel(interaction);
+        await this.replaceWithStatus(client, `**${this.target.username}** has cancelled their request for a ride to \`${this.dest}\`.`);
+        interaction.reply({content: 'Request cancelled. Please be sure to inform anyone who offered you a ride!', ephemeral: true});
     }
 }
 
