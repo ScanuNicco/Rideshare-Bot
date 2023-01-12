@@ -1,1 +1,2 @@
 exports.UPDATE_CHANNEL_ID = "1043644962941702244";
+exports.VERSION = "1.2";

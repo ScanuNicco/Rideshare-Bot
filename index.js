@@ -50,6 +50,8 @@ var j;
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, c => {
+	console.log("\x1b[31m######                                                        ######               \n#     # # #####  ######  ####  #    #   ##   #####  ######    #     #  ####  ##### \n#     # # #    # #      #      #    #  #  #  #    # #         #     # #    #   #   \n######  # #    # #####   ####  ###### #    # #    # #####     ######  #    #   #   \n#   #   # #    # #           # #    # ###### #####  #         #     # #    #   #   \n#    #  # #    # #      #    # #    # #    # #   #  #         #     # #    #   #   \n#     # # #####  ######  ####  #    # #    # #    # ######    ######   ####    #   ");
+	console.log("\x1b[37m --------------------------------- \x1b[34mVersion " + constants.VERSION + "\x1b[37m ---------------------------------\n");
 	j = schedule.scheduleJob({hour: 20, minute: 0}, async function() {
 		var channel = await client.channels.fetch(constants.UPDATE_CHANNEL_ID);
 		var update = client.commands.get("writeupdate").getUpdateContent();
@@ -60,7 +62,7 @@ client.once(Events.ClientReady, c => {
 			//console.log("No new ride requests!");
 		}
 	});
-	console.log(`Ready! Logged in as ${c.user.tag}`);
+	console.log(`\x1b[32mReady!\x1b[37m Logged in as ${c.user.tag}`);
 });
 
 /* Handle button interactions */
