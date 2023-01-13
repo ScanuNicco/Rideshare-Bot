@@ -2,25 +2,11 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 var LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = new LocalStorage('./ridedata');
 const constants = require("../constants.js");
+const { RideCommandBuilder, Request } = require('../rideEventBuilder.js');
 
 module.exports = {
-	data: new SlashCommandBuilder()
-		.setName('emergencyrequest')
-		.setDescription('If you\'re really in a pinch or you need to leave today, you can use this command.')
-		.addStringOption(option =>
-			option.setName('where')
-				.setDescription('Where are you going? Keep this under 5 words.')
-				.setRequired(true))
-		.addStringOption(option =>
-			option.setName('when')
-				.setDescription('When are you going? Be sure to include the numerical date. "Thursday" is not specific enough.')
-				.setRequired(true))
-		.addBooleanOption(option =>
-			option.setName('payment')
-				.setDescription('Are you expecting/offering payment to cover your share of gas/parking?'))
-		.addStringOption(option =>
-			option.setName('additional-info')
-				.setDescription('Anything else you want to add.')),
+	data: new RideCommandBuilder('emergencyrequest', 'If you\'re really in a pinch or you need to leave today, you can use this command.')
+		.addDefaultOptionals(),
 	async execute(interaction) {
 		var requests = JSON.parse(localStorage.getItem('requests')) ?? [];
 		const target = interaction.user;
