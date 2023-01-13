@@ -8,6 +8,7 @@ var schedule = require('node-schedule');
 localStorage = new LocalStorage('./ridedata');
 const constants = require("./constants.js");
 const { Offer, Request } = require("./rideEventBuilder.js");
+const Logger = require("./logger.js");
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -50,19 +51,20 @@ var j;
 // When the client is ready, run this code (only once)
 // We use 'c' for the event parameter to keep it separate from the already defined 'client'
 client.once(Events.ClientReady, c => {
-	console.log("\x1b[31m######                                                        ######               \n#     # # #####  ######  ####  #    #   ##   #####  ######    #     #  ####  ##### \n#     # # #    # #      #      #    #  #  #  #    # #         #     # #    #   #   \n######  # #    # #####   ####  ###### #    # #    # #####     ######  #    #   #   \n#   #   # #    # #           # #    # ###### #####  #         #     # #    #   #   \n#    #  # #    # #      #    # #    # #    # #   #  #         #     # #    #   #   \n#     # # #####  ######  ####  #    # #    # #    # ######    ######   ####    #   ");
-	console.log("\x1b[37m --------------------------------- \x1b[34mVersion " + constants.VERSION + "\x1b[37m ---------------------------------\n");
+	Logger.writeBanner();
 	j = schedule.scheduleJob({hour: 20, minute: 0}, async function() {
 		var channel = await client.channels.fetch(constants.UPDATE_CHANNEL_ID);
 		var update = client.commands.get("writeupdate").getUpdateContent();
+		var now = new Date();
 		if(update != false) {
-			//console.log("Sending daily update!");
+			Logger.logInfo("Sending daily update for " + (now.getMonth() + 1) + "/" + now.getDate() + "/" + now.getFullYear() + "!");
 			channel.send({embeds: [update]});
 		} else {
-			//console.log("No new ride requests!");
+			Logger.logInfo("No new RideEvents on " + (now.getMonth() + 1) + "/" + now.getDate() + "/" + now.getFullYear() + ", update not sent.");
 		}
 	});
-	console.log(`\x1b[32mReady!\x1b[37m Logged in as ${c.user.tag}`);
+	console.log(`\x1b[1;32mReady!\x1b[0m Logged in as ${c.user.tag}`);
+	Logger.logDebug("Verbose mode enabled!");
 });
 
 /* Handle button interactions */
