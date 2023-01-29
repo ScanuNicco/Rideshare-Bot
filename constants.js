@@ -1,5 +1,5 @@
 exports.UPDATE_CHANNEL_ID = "1043644962941702244"; //Where are daily updates sent
-exports.VERSION = "1.2"; //Bot Version Number
+exports.VERSION = "1.3"; //Bot Version Number
 exports.VERBOSE = true;
 exports.HOSTNAME = "http://137.112.204.209:8081/"; //Where is the bot hosted. This should be in the form of https://example.com/
 exports.CATEGORIES = {
