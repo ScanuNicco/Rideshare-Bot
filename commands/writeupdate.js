@@ -1,7 +1,7 @@
-const { SlashCommandBuilder, EmbedBuilder, hyperlink } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 var LocalStorage = require('node-localstorage').LocalStorage;
-localStorage = new LocalStorage('./ridedata');
-const Logger = require('../logger.js');
+const { Offer, Request } = require('../rideEventBuilder.js');
+const Logger = require("../logger.js");
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -10,6 +10,7 @@ module.exports = {
 	async execute(interaction) {
         var update = writeUpdate();
         if(writeUpdate() != false) {
+			await interaction.reply(`**${interaction.user.username}** requested a daily update:`);
             interaction.channel.send({embeds: [writeUpdate()]});
         } else {
             await interaction.reply({content: "No one posted any rides today, so no update will be sent.", ephemeral: true});
@@ -26,19 +27,19 @@ function writeUpdate() {
         .setColor(0x0099FF)
         .setTitle("Daily Update " + (now.getMonth() + 1) + "/" + now.getDate() + "/" + now.getFullYear())
         .setFooter({text: "Daily updates are always sent at 11:00pm"});
-	var rides = JSON.parse(localStorage.getItem('rides')) ?? [];
-    var requests = JSON.parse(localStorage.getItem('requests')) ?? [];
+	var rides = Offer.loadEvents();
+    var requests = Request.loadEvents();
     Logger.logDebug("	Offers: " + Object.keys(rides).length);
     Logger.logDebug("	Requests: " + Object.keys(requests).length);
 	const HOURS_24 = 24*60*60*1000; //Note: Javascript timestamps are in **Milliseconds**
 	Logger.logDebug(`	Looking for RideEvents within ${HOURS_24} of ${now.getTime()}`)
 	var ridesText = "";
 	for(const key in rides){
-		ride = rides[key];
+		ride = new Offer(rides[key]);
         Logger.logDebug(`	Ride offer from ${ride.target.username}: ${now.getTime()} - ${ride.timestamp} = ${(now.getTime() - ride.timestamp)}`);
 		if(now.getTime() - ride.timestamp < HOURS_24 && ride.deleted !== true) {
 			Logger.logDebug("		RideEvent will be posted in the update!");
-			ridesText += ride.target.username + " is offering a ride " + ride.whencestring + "to `" + ride.dest + "` on `" + ride.when + "`. " + hyperlink("More Info", `https://discord.com/channels/${ride.message.guildId}/${ride.message.channelId}/${ride.message.id}`, "here") + "\n";
+			ridesText += ride.writeUpdateText();
 		}
 	}
 	if(ridesText != "") {
@@ -46,11 +47,11 @@ function writeUpdate() {
     }
 	var requestsText = "";
 	for(const key in requests){
-		ride = requests[key];
+		ride = new Request(requests[key]);
 		Logger.logDebug(`	Ride request from ${ride.target.username}: ${now.getTime()} - ${ride.timestamp} = ${(now.getTime() - ride.timestamp)}`);
 		if(now.getTime() - ride.timestamp < HOURS_24 && ride.deleted !== true) {
 			Logger.logDebug("		RideEvent will be posted in the update!");
-			requestsText += ride.target.username + " is looking for a ride " + ride.whencestring + "to `" + ride.dest + "` on `" + ride.when + "`. " + hyperlink("More Info", `https://discord.com/channels/${ride.message.guildId}/${ride.message.channelId}/${ride.message.id}`, "here") + "\n";
+			requestsText += ride.writeUpdateText();
 		}
 	}
     if(requestsText != "") {

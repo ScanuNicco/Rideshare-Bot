@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Search | Rose Rideshares</title>
+        <link rel="icon" href="slowlane.png"></link>
+        <link rel="stylesheet" href="styles.css"></link>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+    <body>
+        <div class="headerBar">
+            <a href="/"><img src="slowlane_small.png"></a><input id="searchBar" placeholder="Search for a ride..." onkeypress="if (event.key == 'Enter') { searchNow(); }"></input><button onclick="searchNow()"><img src="search.svg"></button><button class="smolGlowyButton" onclick="location.href = 'https://discord.gg/nSraC7nYMm'"><img src="discord.svg"></button>
+        </div>
+        <iframe id="loading" src="loading.svg"></iframe>
+        <div id="resultsCont">
+        </div>
+        <div id="filterCont" onclick="generateHTML()">
+            <h2>Filter Results</h2>
+            <h3>Type</h3>
+            <div class="checkCont">
+                <input type="checkbox" class="styledCheckbox" checked id="offersBox"></input><label>Offers</label>
+            </div>
+            <div class="checkCont">
+                <input type="checkbox" class="styledCheckbox" checked id="requestBox"></input><label>Requests</label>
+            </div>
+            <h3>Date Range</h3>
+            <input type="datetime-local" class="styledInput" id="rangeStart" onchange="generateHTML()" style="width: calc(100% - 10px);"></input><br>
+            <p style="margin:auto; text-align: center">To</p>
+            <input type="datetime-local"  class="styledInput" id="rangeEnd" onchange="generateHTML()" style="width: calc(100% - 10px);"></input><br>
+            <h3>Category</h3>
+            <select id="catSelect" class="styledInput">
+                <option value="">All Categories</option>
+            </select>
+            <button class="bigGlowyButton" onclick="resetFilter()">Reset</button>
+        </div>
+        <div id="modalBackground">
+            <button id="close" onclick="closeModal()">&times;</button>
+            <div id="modal">
+                <h1 id="rideModalHeader">Ride Request for ___</h1>
+                <div id="statusBox">
+                    <div id="statusLabel">Status:</div>
+                    <div id="statusContent"></div>
+                </div>
+                <table>
+                    <tr><td class="label">Category:</td><td id="cat"></td></tr>
+                    <tr><td class="label">User:</td><td id="user"></td></tr>
+                    <tr><td class="label">From:</td><td id="from"></td></tr>
+                    <tr><td class="label">When:</td><td id="when"></td></tr>
+                    <tr class="offerOnly"><td class="label">Vehicle:</td><td id="vehicle"></td></tr>
+                    <tr><td class="label">Payment:</td><td id="payment"></td></tr>
+                    <tr><td class="label">Additional Info:</td><td id="info"></td></tr>
+                </table>
+                <a id="goToMessage">
+                    <button class="bigGlowyButton">View On Discord</button>
+                </a>
+            </div>
+        </div>
+        <script src="shared.js"></script>
+        <script>
+                var q;
+                var rideEvents;
+
+                window.onload = async function() {
+                    q = getUrlVars()['q'];
+                    document.getElementById('searchBar').value = q;
+                    await search(q);
+                    html = "";
+                    for(var i = 0; i < rideEvents[2].length; i++){
+                        html += `<option>${rideEvents[2][i]}</option>`;
+                    }
+                    document.getElementById("catSelect").innerHTML += html;
+                }
+
+                async function search(q) {
+                    const result = await fetch('/api/query', {
+                        method: 'POST',
+                        body: JSON.stringify({Query: q}),
+                        headers: {"Content-type": "application/json"}
+                    });
+                    const json = await result.json();
+                    console.log(json);
+                    rideEvents = json;
+                    generateHTML();
+                }
+
+                function searchNow() {
+                    document.getElementById("loading").style.display = 'block';
+                    document.getElementById("filterCont").style.display = 'none';
+                    document.getElementById("resultsCont").innerHTML = "";
+                    var query = document.getElementById("searchBar").value;
+                    search(query);
+                    window.history.pushState('page2', 'Title', '/search.html?q=' + query);
+                }
+
+                function generateHTML() {
+                    html = "";
+                    if(document.getElementById("offersBox").checked){
+                        for(off in rideEvents[1]) {
+                            re = rideEvents[1][off];
+                            if(passesFilters(re)){
+                                var date = new Date(re.when).toLocaleString();
+                                re.dateObj = date;
+                                html += `<div class='rideCard' onclick="showOffer(${off})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${re.dest}</h2><span><b>From:</b> ${re.whence ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
+                            }
+                        }
+                    }
+                    if(document.getElementById("requestBox").checked){
+                        for(req in rideEvents[0]) {
+                            re = rideEvents[0][req];
+                            if(passesFilters(re)){
+                                var date = new Date(re.when).toLocaleString();
+                                re.dateObj = date;
+                                html += `<div class='rideCard' onclick="showRequest(${req})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${re.dest}</h2><span><b>From:</b> ${re.whence ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;
+                            }
+                        }
+                    }
+                    document.getElementById("resultsCont").innerHTML = html;
+                    document.getElementById("loading").style.display = 'none';
+                    document.getElementById("filterCont").style.display = 'block';
+                }
+
+                function passesFilters(re) {
+                    var start = Number.MIN_SAFE_INTEGER;
+                    var end = Number.MAX_SAFE_INTEGER;
+                    if(document.getElementById("rangeStart").value != "") {
+                        start = new Date(document.getElementById("rangeStart").value).getTime();
+                    }
+                    if(document.getElementById("rangeEnd").value != "") {
+                        end = new Date(document.getElementById("rangeEnd").value).getTime();
+                    }
+                    return !re.deleted && re.when <= end && re.when >= start && re.cat.includes(document.getElementById('catSelect').value);
+                }
+
+                function showOffer(off) {
+                    var offer = rideEvents[1][off];
+                    showRideEvent(offer);
+                    for(var i = 0; i < document.getElementsByClassName("offerOnly").length; i++){
+                        document.getElementsByClassName("offerOnly")[i].style.display = "";
+                    }
+                    document.getElementById("payment").innerText = offer.payment ? offer.target.username + " is excpecting payment to help cover gas/parking" : "Not requested.";
+                    document.getElementById("vehicle").innerText = offer.vehicleInfo;
+                    document.getElementById("rideModalHeader").innerText = "Ride Offer to " + offer.dest;
+                    openModal();
+                }
+
+                function showRequest(req) {
+                    var request = rideEvents[0][req];
+                    showRideEvent(request);
+                    document.getElementById("payment").innerText = request.payment ? request.target.username + " is offering payment to help cover gas/parking" : "Not offering payment.";
+                    for(var i = 0; i < document.getElementsByClassName("offerOnly").length; i++){
+                        document.getElementsByClassName("offerOnly")[i].style.display = "none";
+                    }
+                    document.getElementById("rideModalHeader").innerText = "Ride Request for " + request.dest;
+                    openModal();
+                }
+
+                function showRideEvent(re) {
+                    document.getElementById("cat").innerText = re.cat;
+                    document.getElementById("user").innerText = re.target.username;
+                    document.getElementById("from").innerText = re.whence ?? "Rose-Hulman Institute of Technology";
+                    document.getElementById("when").innerText = re.dateObj.toLocaleString();
+                    document.getElementById("info").innerText = re.info ?? "None";
+                    document.getElementById("goToMessage").href = `https://discord.com/channels/${re.message.guildId}/${re.message.channelId}/${re.message.id}`;
+                    document.getElementById("statusContent").innerText = re.status ?? "No status";
+                }
+
+                function closeModal() {
+                    document.getElementById("modalBackground").style.top = "100vh";
+                    document.getElementById("modalBackground").style.borderRadius = "100px";
+                }
+
+                function openModal() {
+                    document.getElementById("modalBackground").style.top = "0vh";
+                    document.getElementById("modalBackground").style.borderRadius = "0px";
+                }
+
+                function resetFilter() {
+                    document.getElementById("rangeStart").value = "";
+                    document.getElementById("rangeEnd").value = "";
+                    document.getElementById("offersBox").checked = true;
+                    document.getElementById("requestBox").checked = true;
+                    document.getElementById("catSelect").value = "";
+                    generateHTML();
+                }
+            </script>
+            <style>
+                body {
+                    margin-top: 150px;
+                    display: flex;
+                }
+
+                .headerBar {
+                    background: #333;
+                    position: fixed;
+                    top: 0px;
+                    left: 0px;
+                    width: 100vw;
+                    display: flex;
+                    box-shadow: 0px 3px 5px rgba(0, 0, 0, .2);
+                    z-index: 5;
+                }
+
+                .headerBar input {
+                    width: 100%;
+                }
+
+                .headerBar img {
+                    height: 50px;
+                    padding: 8px;
+                }
+
+                .headerBar a {
+                    transition-duration: .3s;
+                }
+
+                .headerBar a:hover {
+                    background: #555;
+                }
+
+                .headerBar button, .headerBar a {
+                    display: flex;
+                    align-items: center;
+                }
+
+                .headerBar button img {
+                    height: 28px;
+                    width: 28px;
+                    padding: 0px;
+                }
+
+                #resultsCont {
+                    display: flex;
+                    flex-wrap: wrap;
+                    width: 100%;
+                }
+
+                #filterCont {
+                    background: #151515;
+                    width: max-content;
+                    border-radius: 5px;
+                    box-shadow: 0px 0px 4px rgba(0, 0, 0, .4);
+                    padding: 15px;
+                    display: none;
+                    height: calc(100vh - 300px);
+                    position: sticky;
+                    top: 150px;
+                }
+
+                #filterCont h2 {
+                    text-align: center;
+                }
+
+                #filterCont h3 {
+                    margin-bottom: 10px;
+                }
+
+                #filterCont .styledInput {
+                    font-size: 12pt;
+                    min-width: 0px;
+                }
+
+                .rideCard {
+                    background: #2f2f2f;
+                    margin: 10px;
+                    border-radius: 5px;
+                    display: flex;
+                    transition-duration: .5s;
+                    height: 200px;
+                    min-height: min-content;
+                    overflow: hidden;
+                    transition: ease-in-out .2s;
+                }
+
+                .rideCard:hover {
+                    transform: scale(1.03);
+                }
+
+                .leftCol, .rightCol {
+                    flex-direction: column;
+                    display: inline-flex;
+                    margin: 15px;
+                }
+
+                .leftCol {
+                    align-items: center;
+                    padding: 15px;
+                    background: #444;
+                    margin: 0px;
+                }
+
+                .leftCol img {
+                    border-radius: 5px;
+                }
+
+                .rideCard h2 {
+                    margin: 0px 0px 10px 0px !important;
+                }
+
+                .rideCard h4, .rideCard h3, .rideCard span {
+                    margin: 5px 0px !important;
+                }
+
+                .rideCard span {
+                    display: block;
+                }
+
+                #modalBackground {
+                    position: fixed;
+                    z-index: 10;
+                    top: 100vh;
+                    left: 0px;
+                    background: rgba(0, 0, 0, .3);
+                    backdrop-filter: blur(15px);
+                    width: 100vw;
+                    height: 100vh;
+                    transition-duration: .5s;
+                    border-radius: 100px;
+                }
+
+                #modal {
+                    background: #333;
+                    margin: 10% auto;
+                    width: 75%;
+                    border-radius: 5px;
+                    padding: 15px;
+                }
+
+                #modal h1 {
+                    text-align: center;
+                }
+
+                #modal table {
+                    background: #222;
+                    margin: auto;
+                    border-radius: 5px;
+                    padding: 5px;
+                    width: 70%;
+                }
+
+                .label {
+                    font-weight: bold;
+                    text-align: right;
+                }
+
+                #close {
+                    border: none;
+                    background: transparent;
+                    color: #eee;
+                    font-size: 36pt;
+                    position: absolute;
+                    top: 0px;
+                    right: 0px;
+                    border-radius: 0px;
+                    border-bottom-left-radius: 5px;
+                    padding: 0px 15px;
+                    transition-duration: .1s;
+                }
+
+                #close:hover {
+                    background: firebrick;
+                }
+
+                #loading {
+                    width: 200px;
+                    height: 200px;
+                    left: calc(50% - 100px);
+                    top: calc(50% - 50px);
+                    border: none;
+                    position: absolute;
+                }
+
+                #statusBox {
+                    background: #222;
+                    margin: 15px auto;
+                    width: 70%;
+                    border-radius: 5px;
+                    display: flex;
+                    overflow: hidden;
+                }
+
+                #statusLabel {
+                    background: #444;
+                    font-weight: bolder;
+                    padding: 12px;
+                }
+
+                #statusContent {
+                    padding: 12px;
+                }
+
+                @media screen and (max-width: 600px) {
+                    .headerBar button img {
+                        height: 22px;
+                        width: 22px;
+                    }
+
+                    #searchBar {
+                        font-size: 14pt;
+                        padding: 5px;
+                    }
+
+                    h2 {
+                        font-size: 14pt;
+                        line-height: 1.2;
+                    }
+
+                    div, td, th {
+                        line-height: 1.4;
+                    }
+
+                    #filterCont {
+                        position: absolute;
+                        top: 0px;
+                        left: 0px;
+                        width: calc(100% - 30px);
+                        height: min-content;
+                        padding-top: 80px;
+                        background: #313131;
+                        text-align: center;
+                    }
+
+                    #resultsCont {
+                        margin-top: 520px;
+                    }
+
+                    .styledInput {
+                        margin: auto;
+                        width: 80% !important;
+                    }
+                }
+                </style>
+        </body>
+    </html>

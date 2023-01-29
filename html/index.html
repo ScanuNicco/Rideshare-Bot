@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rose Rideshares</title>
+        <link rel="icon" href="slowlane.png"></link>
+        <link rel="stylesheet" href="styles.css"></link>
+    </head>
+<body>
+<img src="slowlane.png" id="logo">
+<iframe id="bkg" src="ridesharebackground.svg"></iframe>
+<div id="fancyHeader">
+<h1>Where are you headed?</h1>
+<form action="search.html" method="get" id="mainSearch">
+<input placeholder="Indy, Chicago, Cleveland, St. Louis, Urbana, Cincinatti, Piedmont, Madison, .." id="searchBar" name="q"></input><button class="purpleButton">Search</button>
+</form>
+</div>
+<h1>Want to Post Ride Offers or Ride Requests?</h1>
+<h3>Join the Rose-Rideshares Discord server!</h3>
+<iframe src="https://discord.com/widget?id=1027317839633326140&theme=dark" id="dWidget" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+<style>
+body {
+    text-align: center;
+    overflow-x: hidden;
+}
+
+#bkg {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 50vh;
+    border: none;
+    background: #111;
+    z-index: -1;
+}
+
+#fancyHeader {
+    width: 100vw;
+    height: 50vh;
+    text-align: center;
+}
+
+#fancyHeader h1 {
+    font-size: 82pt;
+    margin: 0px;
+    padding: 42px;
+}
+
+#fancyHeader input {
+    width: 50vw;
+    font-size: 24pt;
+    background: #b7b7b745;
+    backdrop-filter: blur(15px);
+}
+
+#fancyHeader button {
+    font-size: 18pt;
+}
+
+#mainSearch {
+    display: flex;
+    justify-content: center;
+}
+
+#logo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 64px;
+}
+
+#dWidget {
+    width: 50%;
+    height: 500px;
+    border: none;
+}
+
+@media screen and (max-width: 600px) {
+    #fancyHeader h1 {
+        padding: 5px;
+        padding-top: 64px;
+        font-size: 28pt;
+    }
+
+    h1 {
+        font-size: 20pt;
+    }
+
+    #dWidget {
+        width: 90%;
+    }
+
+    #fancyHeader input {
+        width: 100%;
+        font-size: 14pt;
+    }
+}
+</style>
+</body>
+</head>
+</html>
