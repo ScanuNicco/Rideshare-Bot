@@ -1,5 +1,5 @@
 // Require the necessary discord.js classes
-const { Client, Collection, Events, GatewayIntentBits, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, EmbedBuilder } = require('discord.js');
 const { token } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -9,6 +9,9 @@ localStorage = new LocalStorage('./ridedata');
 const constants = require("./constants.js");
 const { Offer, Request } = require("./rideEventBuilder.js");
 const Logger = require("./logger.js");
+
+var http = require('http');
+var qs = require('querystring');
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -70,20 +73,29 @@ client.once(Events.ClientReady, c => {
 /* Handle button interactions */
 client.on(Events.InteractionCreate, async function(interaction) {
 	if (!(interaction.isButton() || interaction.isModalSubmit())) return;
-	var requests = JSON.parse(localStorage.getItem('requests')) ?? [];
-	var offers = JSON.parse(localStorage.getItem('rides')) ?? [];
+	Logger.logDebug("Recieved button interaction of type " + interaction.customId);
+	// --- Hande Create Buttons ---
+	if(interaction.customId == 'newOffer'){
+		client.commands.get("offer").execute(interaction);
+		return;
+	} else if(interaction.customId == 'newRequest'){
+		client.commands.get("request").execute(interaction);
+		return;
+	}
+	var requests = Request.loadEvents();
+	var offers = Offer.loadEvents();
 	const panelID = interaction.message.id;
 	//Rides are stored under their respective panel ID, so load the correct ride
 	var rdEvtData = requests[panelID] ?? offers[panelID];
 	var rdEvt;
 	if (panelID in requests) { //This could be a one-liner but for the sake of readability I won't. const rdEvt = panelID in requests ? new Request() : new Offer();
-		rdEvt = new Request();
+		rdEvt = new Request(rdEvtData);
+		requests[panelID] = rdEvt;
 		//Now, convert the stored "data object" into a proper RideEvent
-		rdEvt.fromDataObject(requests[panelID]);
 	} else if (panelID in offers) {
-		rdEvt = new Offer();
+		rdEvt = new Offer(rdEvtData);
+		offers[panelID] = rdEvt;
 		//Now, convert the stored "data object" into a proper RideEvent
-		rdEvt.fromDataObject(offers[panelID]);
 	} else {
 		console.log("Ride not found!");
 		interaction.reply({content: "ERROR: RideEvent not found! Please contact @ScanuRag#2531"});
@@ -97,7 +109,7 @@ client.on(Events.InteractionCreate, async function(interaction) {
 		}
 	} else if (interaction.customId == "foundRide"){
 		if(rdEvt.deleted !== true){
-			await rdEvt.appendStatus(client, `**Good News!** ${rdEvt.target.username} found a ride.`, true);
+			await rdEvt.appendStatus(client, `Good News!  ${rdEvt.target.username} found a ride.`, true);
 			interaction.reply({content: 'Awesome news! I\'m thrilled that I was able to help you get to your destination.', ephemeral: true});
 		} else {
 			interaction.reply({content: 'ERROR: Request has already been cancelled', ephemeral: true});
@@ -124,13 +136,172 @@ client.on(Events.InteractionCreate, async function(interaction) {
 		if(rdEvt.deleted !== true){
 			await rdEvt.appendStatus(client, interaction.fields.getTextInputValue('statusInput'), false);
 			interaction.reply({content: 'Status updated', ephemeral: true});
+			Logger.logDebug("Status saved");
 		} else {
 			interaction.reply({content: 'ERROR: Cannot update status of cancelled request', ephemeral: true});
 		}
 	}
-	localStorage.setItem('rides', JSON.stringify(offers));
-	localStorage.setItem('requests', JSON.stringify(requests));
+	Request.saveEvents(requests);
+	Offer.saveEvents(offers);
 });
 
 // Log in to Discord with your client's token
 client.login(token);
+
+// Create web server
+http.createServer(function (req, res) {
+	if(req.url.indexOf('../') > 0) {
+		res.writeHead(403, {'Content-Type': 'text/html'});
+		// Write a response to the client
+		res.write('Did you really think that would work? On a lesser server than myself perhaps, but never on me! My creator has seen far too many "hacking" attempts to allow me to fall for something as simple as a ../ in the URL. Lest you try any more nefarious tricks, I\'ve flagged your IP as a troublemaker.');
+		// End the response
+		res.end();
+	}
+	if(req.method == 'POST') {
+		Logger.logDebug('Post Request: ' + req.url);
+		// Write a response to the client
+		let body = '';
+		req.on('data', chunk => {
+			body += chunk.toString();
+		});
+		req.on('end', () => {
+			Logger.logDebug('Recieved Data: ' + body);
+			var bodyJSON = JSON.parse(body);
+			Logger.logDebug('Processing POST request for: ' + req.url);
+			if(req.url == "/api/query") {
+				res.writeHead(200, {'Content-Type': 'application/json'});
+				var requests = JSON.parse(localStorage.getItem('requests')) ?? {};
+				var offers = JSON.parse(localStorage.getItem('rides')) ?? {};
+				var query = bodyJSON['Query'];
+				res.end(`[${JSON.stringify(findMatchingRideEvents(query, requests))}, ${JSON.stringify(findMatchingRideEvents(query, offers))}, ${JSON.stringify(Object.keys(constants.CATEGORIES))}]`);
+			} else if(req.url == "/api/getState") {
+				res.writeHead(200, {'Content-Type': 'application/json'});
+				var states = JSON.parse(localStorage.getItem('states')) ?? {};
+				var state = states[bodyJSON['stateID']] ?? {error: "State " + bodyJSON.stateID + " not found"};
+				res.end(JSON.stringify(state));
+			} else if(req.url == "/api/getCategories") {
+				res.writeHead(200, {'Content-Type': 'application/json'});
+				res.end(JSON.stringify(Object.keys(constants.CATEGORIES)));
+			} else if(req.url == "/api/submitRideEvent") {
+				var states = JSON.parse(localStorage.getItem('states')) ?? {};
+				var state = states[bodyJSON['stateID']];
+				if(state == null || state == undefined) {
+					res.writeHead(422, {'Content-Type': 'application/json'});
+					res.end("Invalid state! Please genereate a new link using the discord commands");
+					Logger.logDebug("Ride form submitted with invalid state!");
+					return;
+				}
+				bodyJSON['target'] = state['user'];
+				bodyJSON['payment'] = bodyJSON['payment'] == 'on';
+				bodyJSON['when'] = new Date(bodyJSON['when']).getTime();
+				var re;
+				Logger.logDebug("Recieve data for ride type: " + bodyJSON.type);
+				if(bodyJSON.type == "request") {
+					re = new Request(bodyJSON);
+				} else {
+					re = new Offer(bodyJSON);
+				}
+				Logger.logDebug(re);
+				re.sendRideMessage(client, constants.CATEGORIES[bodyJSON["cat"]]).then(function(result) {
+					if(re.message == null) {
+						Logger.logError("Error while processing ")
+						Logger.logError("Message did not send for some reason!");
+					}
+					if(state.urgent) {
+						const message = re.writeUpdateText();
+						const update = new EmbedBuilder()
+							.setColor(0x0099FF)
+							.setTitle(":rotating_light: Urgent Request :rotating_light:")
+							.addFields({name: "Details:", value: message}, {name: "Additional Info:", value: (re.info ?? "None")});
+						client.channels.fetch(constants.UPDATE_CHANNEL_ID).then(function (channel){
+							channel.send({content: "<@&1027782166811254805>", embeds: [update]});
+						});
+					}
+					re.sendControls(client).then(function (result) {
+						if(bodyJSON.type == "request") {
+							Logger.logDebug(result);
+							var requests = JSON.parse(localStorage.getItem('requests')) ?? [];
+							requests[result] = re;
+							localStorage.setItem('requests', JSON.stringify(requests));
+
+						} else {
+							var offers = JSON.parse(localStorage.getItem('rides')) ?? [];
+							offers[result] = re;
+							localStorage.setItem('rides', JSON.stringify(offers));
+						}
+						res.writeHead(201, {'Content-Type': 'application/json'});
+						res.end(JSON.stringify({status: 'Success'}));
+					});
+				});
+			} else {
+				res.writeHead(404, {'Content-Type': 'text/html'});
+				Logger.logDebug("Not Found: " + req.url);
+				// End the response
+				res.end('Endpoint not found!');
+			}
+		});
+	} else if (req.method == 'GET') {
+		var filename = "html" + req.url.split('?')[0];
+		if(filename == "html/"){
+			filename = "html/index.html";
+		}
+		fs.readFile(filename, 'utf8', function(err, data) {
+			if(err){
+				if(err.code == 'ENOENT') {
+					res.writeHead(404, {'Content-Type': 'text/html'});
+					fs.readFile("html/404.html", 'utf8', function(err, data) {
+						res.end(data);
+					});
+				} else {
+					res.writeHead(500, {'Content-Type': 'text/html'});
+					fs.readFile("html/500.html", 'utf8', function(err, data) {
+						res.end(data);
+					});
+				}
+				Logger.logDebug("Could not serve: " + filename);
+			} else {
+				var ext = filename.split('.').pop();
+				var contentType = "text/html";
+				switch (ext){
+					case "svg":
+						contentType = "image/svg+xml";
+						break;
+					case "png":
+						contentType = "image/png";
+						serveImage(filename, contentType, res);
+						return;
+						break;
+					case "css":
+						contentType = "text/css";
+						break;
+					case "js":
+						contentType = "text/javascript";
+						break;
+				}
+				res.writeHead(200, {'Content-Type': contentType});
+				Logger.logDebug('Serving: ' + filename);
+				// Write a response to the client
+				res.write(data);
+				// End the response
+				res.end();
+			}
+		});
+	}
+
+}).listen(8081); // Server object listens on port 8081
+
+function serveImage(path, contentType, res) {
+	res.writeHead(200, {'Content-Type': contentType});
+	fs.createReadStream(path).pipe(res);
+}
+
+//query
+function findMatchingRideEvents(query, arr) {
+	result = [];
+	for (re in arr) {
+		if(arr[re].dest.includes(query)){
+			result.push(arr[re]);
+		}
+	}
+	return result;
+}

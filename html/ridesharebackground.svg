@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xml:space="preserve"
+   sodipodi:docname="ridesharebackground.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   id="svg5"
+   version="1.1"
+   viewBox="0 0 508 285.75"
+   height="1080"
+   width="1920"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><sodipodi:namedview
+     id="namedview7"
+     pagecolor="#111111"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.46069265"
+     inkscape:cx="1198.1958"
+     inkscape:cy="646.85209"
+     inkscape:window-width="1920"
+     inkscape:window-height="1007"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" /><defs
+     id="defs2"><inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 142.875 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="508 : 142.875 : 1"
+       inkscape:persp3d-origin="254 : 95.25 : 1"
+       id="perspective7957" /><filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Drop Shadow"
+       id="filter3434"
+       x="-0.16839144"
+       y="-0.14556627"
+       width="1.3258484"
+       height="1.2911325"><feFlood
+         flood-opacity="0.231373"
+         flood-color="rgb(255,255,255)"
+         result="flood"
+         id="feFlood3424" /><feComposite
+         in="flood"
+         in2="SourceGraphic"
+         operator="in"
+         result="composite1"
+         id="feComposite3426" /><feGaussianBlur
+         in="composite1"
+         stdDeviation="3"
+         result="blur"
+         id="feGaussianBlur3428" /><feOffset
+         dx="-0.5"
+         dy="0"
+         result="offset"
+         id="feOffset3430" /><feComposite
+         in="SourceGraphic"
+         in2="offset"
+         operator="over"
+         result="fbSourceGraphic"
+         id="feComposite3432" /><feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix5636" /><feFlood
+         id="feFlood5638"
+         flood-opacity="0.231373"
+         flood-color="rgb(100,100,100)"
+         result="flood"
+         in="fbSourceGraphic" /><feComposite
+         in2="fbSourceGraphic"
+         id="feComposite5640"
+         in="flood"
+         operator="in"
+         result="composite1" /><feGaussianBlur
+         id="feGaussianBlur5642"
+         in="composite1"
+         stdDeviation="3"
+         result="blur" /><feOffset
+         id="feOffset5644"
+         dx="-0.5"
+         dy="0"
+         result="offset" /><feComposite
+         in2="offset"
+         id="feComposite5646"
+         in="fbSourceGraphic"
+         operator="over"
+         result="fbSourceGraphic" /><feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix5648" /><feFlood
+         id="feFlood5650"
+         flood-opacity="0.231373"
+         flood-color="rgb(100,100,100)"
+         result="flood"
+         in="fbSourceGraphic" /><feComposite
+         in2="fbSourceGraphic"
+         id="feComposite5652"
+         in="flood"
+         operator="in"
+         result="composite1" /><feGaussianBlur
+         id="feGaussianBlur5654"
+         in="composite1"
+         stdDeviation="3"
+         result="blur" /><feOffset
+         id="feOffset5656"
+         dx="-0.5"
+         dy="0"
+         result="offset" /><feComposite
+         in2="offset"
+         id="feComposite5658"
+         in="fbSourceGraphic"
+         operator="over"
+         result="fbSourceGraphic" /><feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix7968" /><feFlood
+         id="feFlood7970"
+         flood-opacity="0.231373"
+         flood-color="rgb(41,41,41)"
+         result="flood"
+         in="fbSourceGraphic" /><feComposite
+         in2="fbSourceGraphic"
+         id="feComposite7972"
+         in="flood"
+         operator="in"
+         result="composite1" /><feGaussianBlur
+         id="feGaussianBlur7974"
+         in="composite1"
+         stdDeviation="3"
+         result="blur" /><feOffset
+         id="feOffset7976"
+         dx="-0.5"
+         dy="0"
+         result="offset" /><feComposite
+         in2="offset"
+         id="feComposite7978"
+         in="fbSourceGraphic"
+         operator="over"
+         result="fbSourceGraphic" /><feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix7980" /><feFlood
+         id="feFlood7982"
+         flood-opacity="0.231373"
+         flood-color="rgb(41,41,41)"
+         result="flood"
+         in="fbSourceGraphic" /><feComposite
+         in2="fbSourceGraphic"
+         id="feComposite7984"
+         in="flood"
+         operator="in"
+         result="composite1" /><feGaussianBlur
+         id="feGaussianBlur7986"
+         in="composite1"
+         stdDeviation="3"
+         result="blur" /><feOffset
+         id="feOffset7988"
+         dx="-0.5"
+         dy="0"
+         result="offset" /><feComposite
+         in2="offset"
+         id="feComposite7990"
+         in="fbSourceGraphic"
+         operator="over"
+         result="fbSourceGraphic" /><feColorMatrix
+         result="fbSourceGraphicAlpha"
+         in="fbSourceGraphic"
+         values="0 0 0 -1 0 0 0 0 -1 0 0 0 0 -1 0 0 0 0 1 0"
+         id="feColorMatrix7992" /><feFlood
+         id="feFlood7994"
+         flood-opacity="0.231373"
+         flood-color="rgb(41,41,41)"
+         result="flood"
+         in="fbSourceGraphic" /><feComposite
+         in2="fbSourceGraphic"
+         id="feComposite7996"
+         in="flood"
+         operator="in"
+         result="composite1" /><feGaussianBlur
+         id="feGaussianBlur7998"
+         in="composite1"
+         stdDeviation="3"
+         result="blur" /><feOffset
+         id="feOffset8000"
+         dx="-0.5"
+         dy="0"
+         result="offset" /><feComposite
+         in2="offset"
+         id="feComposite8002"
+         in="fbSourceGraphic"
+         operator="over"
+         result="composite2" /></filter></defs><g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"><path
+       style="fill:#222222;stroke:none;stroke-width:2.50542;stroke-dasharray:none;stroke-opacity:1;fill-opacity:1"
+       d="M 321.13158,290.37703 504.19959,-6.395011 412.90669,-6.3950148 229.83884,290.37703 Z"
+       id="path236-6"
+       sodipodi:nodetypes="ccccc" /><path
+       style="fill:none;stroke:#a64dff;stroke-width:2.50542;stroke-dasharray:20.0434, 10.0217;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 275.48515,290.37703 458.55312,-6.3950137"
+       id="path236" /><path
+       style="fill:#222222;fill-opacity:1;stroke:none;stroke-width:2.50542;stroke-dasharray:none;stroke-opacity:1"
+       d="m 119.61738,289.43237 183.06785,-296.7720382 91.29289,3.8e-6 -183.068,296.7720344 z"
+       id="path236-3-3"
+       sodipodi:nodetypes="ccccc" /><path
+       style="fill:none;fill-opacity:1;stroke:#a64dff;stroke-width:2.50542;stroke-dasharray:20.0434, 10.0217;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 165.26369,289.43237 348.33166,-7.3396671"
+       id="path236-5" /><image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="32.41547"
+       height="65.306633"
+       xlink:href="cars/car-purple.svg"
+       id="car3"
+       x="-326.89218"
+       y="187.99512"
+       transform="rotate(-148.45822)" /><image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="31.541508"
+       height="69.381645"
+       xlink:href="cars/car-yellow.svg"
+       id="car5"
+       x="-327.57254"
+       y="273.35468"
+       transform="rotate(-148.45822)" /><image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="31.388578"
+       height="63.237782"
+       xlink:href="cars/car-blue.svg"
+       id="car6"
+       x="352.34006"
+       y="40.742363"
+       transform="rotate(32.086485)" /><image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="30.033463"
+       height="62.825951"
+       xlink:href="cars/car-red.svg"
+       id="car2"
+       x="392.23941"
+       y="96.061836"
+       transform="rotate(31.194679)" /><image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="30.949848"
+       height="68.080177"
+       xlink:href="cars/car-orange.svg"
+       id="car4"
+       x="-287.46878"
+       y="175.15889"
+       transform="rotate(-148.35096)" /><image
+       preserveAspectRatio="none"
+       inkscape:svg-dpi="96"
+       width="47.993935"
+       height="67.876846"
+       xlink:href="cars/car-black.svg"
+       id="car1"
+       x="344.50616"
+       y="115.71075"
+       transform="rotate(32.086485)" /></g><style
+     id="style377">
+#car6 {
+     animation:drive 3s infinite linear;
+}
+ #car1 {
+     animation: drive 3s infinite linear;
+     animation-delay: 2s;
+}
+ #car2 {
+     animation: drive 4s infinite linear;
+     animation-delay: 2s;
+}
+ #car3 {
+     animation: drive 3s infinite linear;
+}
+ #car5 {
+    /* Yellow Car */
+     animation: drive 3s infinite linear;
+     animation-delay: 2s;
+}
+ #car4 {
+    /* Orange Car */
+     animation: drive 3.8s infinite linear;
+     animation-delay: 1s;
+}
+ @keyframes drive {
+     0%{
+         y: 200px;
+    }
+     70% {
+         y: -400px;
+    }
+     100% {
+         y: -400px
+    }
+}
+</style></svg>

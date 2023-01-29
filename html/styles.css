@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Mandali&display=swap');
+
+                body {
+                    background: #222;
+                    color: #eee;
+                    font-family: 'Mandali', serif;
+                }
+
+                .headerBar button, #fancyHeader button {
+                    background: #555;
+                    color: #eee;
+                    box-shadow: 0px 0px 3px rgba(0, 0, 0, .3);
+                    margin: 10px;
+                    font-size: 14pt;
+                    padding: 10px;
+                    border: none;
+                    border-radius: 5px;
+                    transition-duration: .3s;
+                    min-width: max-content;
+                }
+
+                .headerBar input, #fancyHeader input {
+                    margin: 10px;
+                    font-size: 16pt;
+                    padding: 5px;
+                    padding-left: 15px;
+                    color: #eee;
+                    background: #444;
+                    border: none;
+                    border-radius: 5px;
+                }
+
+                .purpleButton {
+                    background: #a64dff !important;
+                    box-shadow: 0px 0px 3px #a64dff;
+                }
+
+                button:hover {
+                    filter: brightness(115%);
+                }
+
+                h1, h3 {
+                    line-height: 1.2;
+                }
+
+                .bigGlowyButton {
+                    width: 70%;
+                }
+
+                .smolGlowyButton, .bigGlowyButton {
+                    margin: 20px 15% 20px 15%;
+                    padding: 15px;
+                    font-size: 13pt;
+                    background: #a64dff !important;
+                    color: #eee;
+                    border-radius: 5px;
+                    border: none;
+                    transition-duration: .2s;
+                }
+
+                .smolGlowyButton:hover, .bigGlowyButton:hover {
+                    background: #b366ff;
+                    box-shadow: 0px 0px 10px #b366ff88;
+                }
+
+                .smolGlowyButton:active, .bigGlowyButton:active {
+                    transform: scale(0.95);
+                }
+
+                .center {
+                    text-align: center;
+                }
+
+                form input, form textarea, form select, .styledInput {
+                    border-radius: 3px;
+                    color: #eee;
+                    background: #222;
+                    padding: 5px;
+                    font-size: 14pt;
+                    box-shadow: inset 0px 0px 5px rgba(0, 0, 0, .3);
+                    border: none;
+                    min-width: 400px;
+                    width: 100%;
+                }
+
+                form input:focus {
+                    outline: none;
+                    background: #454545;
+                }
+
+                form input[type=checkbox], .styledCheckbox {
+                    appearance: none;
+                    background: #555;
+                    height: 30px;
+                    width: 30px !important;
+                    min-width: 30px !important;
+                    box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
+                    border-radius: 3px;
+                    margin: 10px 30px 10px 0px;
+                    transition: ease-in;
+                    transition-duration: .1s;
+                }
+
+                .checkCont {
+                    display: flex;
+                    align-items: center;
+                }
+
+                form input[type=checkbox]:checked, .styledCheckbox:checked {
+                    background: #a64dff;
+                    box-shadow: 0px 0px 5px #a64dff88;
+                }
+
+                @media screen and (max-width: 600px) {
+                    form input, form textarea, form select {
+                        min-width: 200px;
+                        width: calc(100% - 20px);
+                    }
+                }

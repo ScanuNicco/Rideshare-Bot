@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>New Ride | Rose Rideshares</title>
+        <link rel="icon" href="slowlane.png"></link>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+    <body>
+        <div class="accountInfo">
+            <img id="profileDisplay" src="slowlane.png"><div id="infoDisplay"><h4 style="margin: 0px 0px 10px 0px;">Logged In As:</h4><span id="nameText">Mr. Nobody</span></div>
+        </div>
+        <iframe id="bkg" src="ridesharebackground.svg"></iframe>
+        <div class="rideModal">
+            <iframe src="" id="formFrame"></iframe>
+        </div>
+        <style>
+            body{
+                background: #111;
+                color: #eee;
+                font-family: sans-serif;
+            }
+
+            #bkg {
+                position: fixed;
+                height: 100vh;
+                width: 100vw;
+                top: 0px;
+                right: -10vw;
+                z-index: -1;
+                border: none;
+            }
+
+            ih {
+                display: block;
+                margin: 20px 20px 5px 2px;
+                font-weight: bold;
+            }
+
+            .rideModal {
+                border-radius: 5px;
+                margin: 20px 50px;
+                height: calc(100vh - 60px);
+                background: #333;
+                width: max-content;
+                padding: 10px 100px 10px 100px;
+            }
+
+            #rideHead {
+                text-align: center;
+            }
+
+            @media screen and (max-width: 600px) {
+                #formFrame {
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    margin: 0px;
+                    border-radius: 0px;
+                    height: 100vh !important;
+                    width: 100vw !important;
+                    overflow-y: auto;
+                    padding: 100px 10px 10px 10px;
+                    background: #333;
+                }
+
+                .accountInfo {
+                    position: relative !important;
+                    z-index: 5;
+                    width: 90%;
+                    background: #222 !important;
+                    left: calc(5% - 10px);
+                    top: 10px;
+                }
+
+                body {
+                    overflow-x: hidden;
+                }
+            }
+
+            #formFrame {
+                width: 500px;
+                height: 100%;
+                border: none;
+            }
+
+            .accountInfo {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 10px;
+                background: #333;
+                border-radius: 5px;
+                display: flex;
+            }
+
+            #infoDisplay {
+                margin-left: 10px;
+            }
+
+            #profileDisplay {
+                height: 64px;
+                border-radius: 5px;
+            }
+        </style>
+        <script src="shared.js"></script>
+        <script>
+        var stateID;
+        var type;
+        window.onload = function() {
+            stateID = getUrlVars()['state'];
+            type = getUrlVars()['type'];
+            if(type == "request") {
+                document.getElementById("formFrame").src = "request.html";
+            } else {
+                document.getElementById("formFrame").src = "offer.html";
+            }
+            loadUserData();
+        }
+
+        async function loadUserData() {
+                    const result = await fetch('/api/getState', {
+                        method: 'POST',
+                        body: JSON.stringify({stateID: stateID}),
+                        headers: {"Content-type": "application/json"}
+                    });
+                    const json = await result.json();
+                    console.log(json);
+                    document.getElementById("profileDisplay").src = json.user.avatarURL;
+                    document.getElementById("nameText").innerText = json.user.tag;
+        }
+        </script>
+    </body>
+</html>
