@@ -30,7 +30,7 @@ class RideCommandBuilder extends SlashCommandBuilder {
 class RideEvent {
     constructor(obj) {
         //The static methods handle object creation because JavaScript can't do constructor overloading
-        this.timestamp = Date.now();
+        this.timestamp = obj.timestamp;
         this.deleted = obj.deleted;
         this.target = obj.target;
         this.dest = obj.dest;

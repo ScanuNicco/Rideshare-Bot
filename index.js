@@ -194,6 +194,7 @@ http.createServer(function (req, res) {
 				bodyJSON['target'] = state['user'];
 				bodyJSON['payment'] = bodyJSON['payment'] == 'on';
 				bodyJSON['when'] = new Date(bodyJSON['when']).getTime();
+				bodyJSON['timestamp'] = Date.now();
 				var re;
 				Logger.logDebug("Recieve data for ride type: " + bodyJSON.type);
 				if(bodyJSON.type == "request") {
