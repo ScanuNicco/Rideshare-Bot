@@ -5,6 +5,7 @@
         <link rel="icon" href="slowlane.png"></link>
         <link rel="stylesheet" href="styles.css"></link>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Search for a ride.">
     </head>
     <body>
         <div class="headerBar">
@@ -99,7 +100,7 @@
                             if(passesFilters(re)){
                                 var date = new Date(re.when).toLocaleString();
                                 re.dateObj = date;
-                                html += `<div class='rideCard' onclick="showOffer(${off})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${re.dest}</h2><span><b>From:</b> ${re.whence ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
+                                html += `<div class='rideCard' onclick="showOffer(${off})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${trimToLength(re.dest)}</h2><span><b>From:</b> ${re.whence ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
                             }
                         }
                     }
@@ -109,7 +110,7 @@
                             if(passesFilters(re)){
                                 var date = new Date(re.when).toLocaleString();
                                 re.dateObj = date;
-                                html += `<div class='rideCard' onclick="showRequest(${req})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${re.dest}</h2><span><b>From:</b> ${re.whence ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;
+                                html += `<div class='rideCard' onclick="showRequest(${req})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.dest)}</h2><span><b>From:</b> ${re.whence ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;
                             }
                         }
                     }
@@ -117,6 +118,13 @@
                     document.getElementById("loading").style.display = 'none';
                     document.getElementById("filterCont").style.display = 'block';
                 }
+
+		function trimToLength(string) {
+			if(string.length > 25) {
+				return string.substring(0, 22) + "...";
+			}
+			return string;
+		}
 
                 function passesFilters(re) {
                     var start = Number.MIN_SAFE_INTEGER;
