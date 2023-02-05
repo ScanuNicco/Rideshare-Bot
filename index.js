@@ -277,6 +277,9 @@ http.createServer(function (req, res) {
 					case "js":
 						contentType = "text/javascript";
 						break;
+					case "txt":
+						contentType = "text/plain";
+						break;
 				}
 				res.writeHead(200, {'Content-Type': contentType});
 				Logger.logDebug('Serving: ' + filename);

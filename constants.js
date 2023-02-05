@@ -1,6 +1,6 @@
 exports.UPDATE_CHANNEL_ID = "1027780828794732574"; //Where are daily updates sent
 exports.VERSION = "1.3"; //Bot Version Number
-exports.VERBOSE = false;
+exports.VERBOSE = true;
 exports.HOSTNAME = "https://rides.scanurag.com/"; //Where is the bot hosted. This should be in the form of https://example.com/
 exports.CATEGORIES = {
     "Chicago": '1027318092910567554',
