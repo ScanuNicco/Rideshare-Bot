@@ -111,7 +111,7 @@
                             if(passesFilters(re)){
                                 var date = new Date(re.when).toLocaleString();
                                 re.dateObj = date;
-                                html += `<div class='rideCard' onclick="showRequest(${req})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.dest)}</h2><span><b>From:</b> ${re.whence ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;
+                                html += `<div class='rideCard' onclick="showRequest(${req})"><div class='leftCol'><img src=${re.target.avatarURL ?? "noPic.svg"}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.dest)}</h2><span><b>From:</b> ${re.whence ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;
                             }
                         }
                     }
