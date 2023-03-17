@@ -69,6 +69,7 @@
                         html += `<option>${rideEvents[2][i]}</option>`;
                     }
                     document.getElementById("catSelect").innerHTML += html;
+                    resetFilter();
                 }
 
                 async function search(q) {
@@ -119,12 +120,12 @@
                     document.getElementById("filterCont").style.display = 'block';
                 }
 
-		function trimToLength(string) {
-			if(string.length > 25) {
-				return string.substring(0, 22) + "...";
-			}
-			return string;
-		}
+                function trimToLength(string) {
+                    if(string.length > 25) {
+                        return string.substring(0, 22) + "...";
+                    }
+                    return string;
+                }
 
                 function passesFilters(re) {
                     var start = Number.MIN_SAFE_INTEGER;
@@ -182,7 +183,9 @@
                 }
 
                 function resetFilter() {
-                    document.getElementById("rangeStart").value = "";
+                    var now = new Date();
+                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                    document.getElementById("rangeStart").value = now.toISOString().slice(0,16);
                     document.getElementById("rangeEnd").value = "";
                     document.getElementById("offersBox").checked = true;
                     document.getElementById("requestBox").checked = true;

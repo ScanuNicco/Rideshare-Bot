@@ -3,6 +3,14 @@ const { v4: uuidv4 } = require('uuid');
 const constants = require("./constants.js");
 var LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = new LocalStorage('./ridedata');
+const sanitizeHtml = require('sanitize-html');
+
+function clean(dirty) {
+    return sanitizeHtml(dirty, {
+        allowedTags: [],
+        allowedAttributes: {}
+    });
+}
 
 class RideCommandBuilder extends SlashCommandBuilder {
 
@@ -29,15 +37,15 @@ class RideCommandBuilder extends SlashCommandBuilder {
 
 class RideEvent {
     constructor(obj) {
-        //The static methods handle object creation because JavaScript can't do constructor overloading
+        //This class should not be instantiated.
         this.timestamp = obj.timestamp;
         this.deleted = obj.deleted;
         this.target = obj.target;
-        this.dest = obj.dest;
-        this.whence = obj.whence;
+        this.dest = clean(obj.dest);
+        this.whence = clean(obj.whence);
         this.when = obj.when;
         this.payment = obj.payment;
-        this.info = obj.info;
+        this.info = clean(obj.info);
         this.message = obj.message; //This is a Data Object, not the actual Message object that has functions and stuff. Use getMessageFromRideEvent() for that.
         this.whencestring = this.whence != '' ? `from ${this.whence} ` : '';
         this.cat = obj.cat;
@@ -99,7 +107,7 @@ class RideEvent {
 class Offer extends RideEvent {
     constructor(obj) {
         super(obj);
-        this.vehicleInfo = obj.vehicleInfo;
+        this.vehicleInfo = clean(obj.vehicleInfo);
     }
 
     writeMessageText() {
