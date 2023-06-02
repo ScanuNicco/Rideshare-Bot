@@ -42,9 +42,11 @@
                     <div id="statusContent"></div>
                 </div>
                 <table>
+                    <tr><td class="label">Date Posted:</td><td id="posted"></td></tr>
                     <tr><td class="label">Category:</td><td id="cat"></td></tr>
                     <tr><td class="label">User:</td><td id="user"></td></tr>
-                    <tr><td class="label">From:</td><td id="from"></td></tr>
+                    <tr><td class="label">Origin:</td><td id="from"></td></tr>
+                    <tr><td class="label">Destination:</td><td id="dest"></td></tr>
                     <tr><td class="label">When:</td><td id="when"></td></tr>
                     <tr class="offerOnly"><td class="label">Vehicle:</td><td id="vehicle"></td></tr>
                     <tr><td class="label">Payment:</td><td id="payment"></td></tr>
@@ -101,7 +103,7 @@
                             if(passesFilters(re)){
                                 var date = new Date(re.when).toLocaleString();
                                 re.dateObj = date;
-                                html += `<div class='rideCard' onclick="showOffer(${off})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${trimToLength(re.dest)}</h2><span><b>From:</b> ${re.whence ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
+                                html += `<div class='rideCard' onclick="showOffer(${off})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${trimToLength(re.destName)}</h2><span><b>From:</b> ${re.whenceName ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
                             }
                         }
                     }
@@ -111,7 +113,7 @@
                             if(passesFilters(re)){
                                 var date = new Date(re.when).toLocaleString();
                                 re.dateObj = date;
-                                html += `<div class='rideCard' onclick="showRequest(${req})"><div class='leftCol'><img src=${re.target.avatarURL ?? "noPic.svg"}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.dest)}</h2><span><b>From:</b> ${re.whence ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;
+                                html += `<div class='rideCard' onclick="showRequest(${req})"><div class='leftCol'><img src=${re.target.avatarURL ?? "noPic.svg"}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.destName)}</h2><span><b>From:</b> ${re.whenceName ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;
                             }
                         }
                     }
@@ -147,7 +149,7 @@
                     }
                     document.getElementById("payment").innerText = offer.payment ? offer.target.username + " is excpecting payment to help cover gas/parking" : "Not requested.";
                     document.getElementById("vehicle").innerText = offer.vehicleInfo;
-                    document.getElementById("rideModalHeader").innerText = "Ride Offer to " + offer.dest;
+                    document.getElementById("rideModalHeader").innerText = "Ride Offer to " + offer.destName;
                     openModal();
                 }
 
@@ -158,14 +160,16 @@
                     for(var i = 0; i < document.getElementsByClassName("offerOnly").length; i++){
                         document.getElementsByClassName("offerOnly")[i].style.display = "none";
                     }
-                    document.getElementById("rideModalHeader").innerText = "Ride Request for " + request.dest;
+                    document.getElementById("rideModalHeader").innerText = "Ride Request for " + request.destName;
                     openModal();
                 }
 
                 function showRideEvent(re) {
+                    document.getElementById("posted").innerText = new Date(re.timestamp).toLocaleString();
                     document.getElementById("cat").innerText = re.cat;
                     document.getElementById("user").innerText = re.target.username;
-                    document.getElementById("from").innerText = re.whence ?? "Rose-Hulman Institute of Technology";
+                    document.getElementById("dest").innerText = re.dest.properties.geocoding.label;
+                    document.getElementById("from").innerText = re.whence.properties.geocoding.label ?? "Rose-Hulman Institute of Technology";
                     document.getElementById("when").innerText = re.dateObj.toLocaleString();
                     document.getElementById("info").innerText = re.info ?? "None";
                     document.getElementById("goToMessage").href = `https://discord.com/channels/${re.message.guildId}/${re.message.channelId}/${re.message.id}`;
@@ -347,9 +351,17 @@
                     width: 70%;
                 }
 
+                #modal td {
+                    line-height: 1.5;
+                    padding: 5px;
+                    color: #ddd;
+                }
+
                 .label {
                     font-weight: bold;
                     text-align: right;
+                    color: #a64dff !important;
+                    width: 120px;
                 }
 
                 #close {

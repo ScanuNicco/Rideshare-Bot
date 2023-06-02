@@ -279,27 +279,27 @@
        transform="rotate(32.086485)" /></g><style
      id="style377">
 #car6 {
-     animation:drive 3s infinite linear;
+     animation:drive 4s infinite linear;
 }
  #car1 {
-     animation: drive 3s infinite linear;
-     animation-delay: 2s;
-}
- #car2 {
      animation: drive 4s infinite linear;
      animation-delay: 2s;
 }
+ #car2 {
+     animation: drive 5s infinite linear;
+     animation-delay: 2s;
+}
  #car3 {
-     animation: drive 3s infinite linear;
+     animation: drive 4s infinite linear;
 }
  #car5 {
     /* Yellow Car */
-     animation: drive 3s infinite linear;
+     animation: drive 4s infinite linear;
      animation-delay: 2s;
 }
  #car4 {
     /* Orange Car */
-     animation: drive 3.8s infinite linear;
+     animation: drive 4.8s infinite linear;
      animation-delay: 1s;
 }
  @keyframes drive {

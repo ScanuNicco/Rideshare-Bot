@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="styles.css"></link>
+  </head>
+  <body>
+    <form id="rideform">
+      <div id="searchPane">
+        <h1>Pick a Location</h1>
+        <input id="searchBox" placeholder="Search for a different location" oninput="populateSuggestions()"></input>
+        <div id="suggestions"></div>
+      </div>
+      <div id="formPane">
+                <ih>Going To</ih>
+                <div class="result" onclick="chooseTo()">
+                  <h2 id="toName"></h2>
+                  <span id="toFull"></span>
+                  <div class="changeCont">
+                    <span>Click to Change Location</span>
+                  </div>
+                </div>
+                <ih>Leaving From</ih>
+                <div class="result" onclick="chooseFrom()">
+                  <h2 id="fromName"></h2>
+                  <span id="fromFull"></span>
+                  <div class="changeCont">
+                    <span>Click to Change Location</span>
+                  </div>
+                </div>
+                <ih>When</ih>
+                <input id="timeIn" type="datetime-local" required></input>
+                <ih>Vehicle Description</ih>
+                <input name="vehicleInfo" required></input>
+                <ih>Payment</ih>
+                <div class="checkCont">
+                <input type="checkbox" name="payment"></input>
+                <label for="payment">I would like passengers to cover their share of gas and/or parking.
+                </div>
+                <ih>Additional Info</ih>
+                <textarea name="info"></textarea>
+                <button class="bigGlowyButton">Create Offer!</button>
+        </div>
+      </form>
+    <style>
+            body {
+                background: transparent;
+            }
+    </style>
+    <script>
+      var currentFeatures;
+      async function populateSuggestions() {
+        if(document.getElementById("searchBox").value == "") {
+          console.log("falling back to favorites");
+          var result = await fetch("favorites.json");
+        } else {
+          var result = await fetch("https://geocode.maps.co/search?q="+event.target.value+"&format=geocodejson");
+        }
+        var json = await result.json();
+        currentFeatures = json.features;
+        var generated = "";
+        for(var i = 0; i < json.features.length; i++){
+          var feature = json.features[i];
+          generated += `<div class="result" onclick="pickLocation(${i})"><h2>${feature.properties.geocoding.name}</h2><span>${trimFullName(feature)}</span></div>`;
+        }
+        document.getElementById("suggestions").innerHTML = generated;
+      }
+
+      var from;
+      var to;
+      var searchingTo = true;
+      populateSuggestions().then(function() {
+        from = currentFeatures[0];
+      });
+
+      function trimFullName(feature) {
+        var output = feature.properties.geocoding.label.substring(feature.properties.geocoding.name.length + 2);
+        if(output.length > 60) {
+          output = output.substring(0, 57) + "...";
+        }
+        return output;
+      }
+
+      function showSearch() {
+        document.getElementById("formPane").style.left = "105vw";
+        document.getElementById("searchPane").style.left = "0vw";
+      }
+
+      function showForm() {
+        document.getElementById("formPane").style.left = "0vw";
+        document.getElementById("searchPane").style.left = "-105vw";
+      }
+
+      function pickLocation(item) {
+        if(searchingTo) {
+          to = currentFeatures[item];
+        } else {
+          from = currentFeatures[item];
+        }
+        genFromTo();
+        showForm();
+      }
+
+      function genFromTo() {
+        document.getElementById("toName").innerText = to.properties.geocoding.name;
+        document.getElementById("toFull").innerText = trimFullName(to);
+        document.getElementById("fromName").innerText = from.properties.geocoding.name;
+        document.getElementById("fromFull").innerText = trimFullName(from);
+      }
+
+      function chooseTo() {
+        searchingTo = true;
+        showSearch();
+      }
+
+      function chooseFrom() {
+        searchingTo = false;
+        showSearch();
+      }
+    </script>
+    <style>
+    .result {
+      position: relative;
+      background: #242424;
+      padding: 5px;
+      margin: 5px auto;
+      border-radius: 3px;
+      box-shadow: 2px 2px 3px rgba(0, 0, 0, .4);
+      transition: ease-in-out .1s;
+      width: calc(100% - 20px);
+      text-align: left;
+    }
+
+    .result:hover {
+      background: #2a2a2a;
+      box-shadow: 1px 1px 2px rgba(0, 0, 0, .4);
+      transform: scale(0.97);
+    }
+
+    .result:active {
+      background: #555;
+      box-shadow: 1px 1px 2px rgba(0, 0, 0, .4);
+      transform: scale(0.97);
+    }
+
+    .result h2 {
+      margin: 0px auto;
+      line-height: 28px;
+    }
+
+    #formPane, #searchPane {
+      position: absolute;
+      top: 0px;
+      transition: left ease .5s;
+    }
+
+    #formPane {
+      left: 105vw;
+      width: 100vw;
+    }
+
+    #searchPane {
+      left: 0vw;
+      width: 100vw;
+      text-align: center;
+    }
+
+    .changeCont {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100%;
+      height: 100%;
+      background: #222;
+      opacity: 0;
+      transition: ease .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .result:hover .changeCont {
+      opacity: 1;
+    }
+
+    .changeCont span {
+      text-align: center;
+      line-height: 100%;
+      font-size: 20px;
+      color: #b366ff;
+    }
+    </style>
+  </body>
+</html>

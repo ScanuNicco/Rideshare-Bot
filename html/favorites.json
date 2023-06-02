@@ -1,0 +1,204 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "geocoding": {
+          "place_id": 148024840,
+          "osm_type": "way",
+          "osm_id": 194578555,
+          "type": "university",
+          "label": "Rose-Hulman Institute of Technology, 5500, Wabash Avenue, Terre Haute, Vigo County, Indiana, 47803, United States",
+          "name": "Rose-Hulman Institute of Technology"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.32415823743071,
+          39.482920050000004
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geocoding": {
+          "place_id": 286784600,
+          "osm_type": "relation",
+          "osm_id": 1812962,
+          "type": "administrative",
+          "label": "Indianapolis, Marion County, Indiana, United States",
+          "name": "Indianapolis"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.1583502,
+          39.7683331
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geocoding": {
+          "place_id": 151988389,
+          "osm_type": "way",
+          "osm_id": 209049565,
+          "type": "aerodrome",
+          "label": "Indianapolis International Airport, 7800, Colonel H. Weir Cook Memorial Drive, Indianapolis, Marion County, Indiana, 46241, United States",
+          "name": "Indianapolis International Airport"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -86.29508388539975,
+          39.7162533
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geocoding": {
+          "place_id": 287736588,
+          "osm_type": "relation",
+          "osm_id": 122604,
+          "type": "administrative",
+          "label": "Chicago, Cook County, Illinois, United States",
+          "name": "Chicago"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.6244212,
+          41.8755616
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geocoding": {
+          "place_id": 288861514,
+          "osm_type": "relation",
+          "osm_id": 13423944,
+          "type": "aerodrome",
+          "label": "O'Hare International Airport, 10000, York Road, O'Hare, Chicago, Jefferson Township, DuPage County, Illinois, 60007, United States",
+          "name": "O'Hare International Airport"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.90917993412859,
+          41.977984899999996
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geocoding": {
+          "place_id": 111869192,
+          "osm_type": "way",
+          "osm_id": 32480814,
+          "type": "aerodrome",
+          "label": "Chicago Midway International Airport, 5700, South Cicero Avenue, Clearing, Chicago, Lake Township, Cook County, Illinois, 60638, United States",
+          "name": "Chicago Midway International Airport"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.7508277936727,
+          41.78544375
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geocoding": {
+          "place_id": 245900599,
+          "osm_type": "way",
+          "osm_id": 733543610,
+          "type": "residential",
+          "label": "Heritage Trail Apartments, Terre Haute, Vigo County, Indiana, United States",
+          "name": "Heritage Trail Apartments"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.35230304316417,
+          39.478595150000004
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geocoding": {
+          "place_id": 258777849,
+          "osm_type": "way",
+          "osm_id": 804659544,
+          "type": "residential",
+          "label": "Ashton Development, Terre Haute, Vigo County, Indiana, 47805, United States",
+          "name": "Ashton Development"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.31240523858722,
+          39.489370300000004
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geocoding": {
+          "place_id": 79537093,
+          "osm_type": "node",
+          "osm_id": 7593024112,
+          "type": "apartments",
+          "label": "Sharp Flats East, Hunt Street, Vigo County, Indiana, 47803, United States",
+          "name": "Sharp Flats East"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.3136387,
+          39.4844617
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "geocoding": {
+          "place_id": 240957035,
+          "osm_type": "way",
+          "osm_id": 702359116,
+          "type": "residential",
+          "label": "Village Quarter Apartments, Terre Haute, Vigo County, Indiana, United States",
+          "name": "Village Quarter Apartments"
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.33401670206966,
+          39.45922564999999
+        ]
+      }
+    }
+  ]
+}

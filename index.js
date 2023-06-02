@@ -191,10 +191,30 @@ http.createServer(function (req, res) {
 					Logger.logDebug("Ride form submitted with invalid state!");
 					return;
 				}
+				//Fill in extra info needed for RideEvent Creation
 				bodyJSON['target'] = state['user'];
 				bodyJSON['payment'] = bodyJSON['payment'] == 'on';
 				bodyJSON['when'] = new Date(bodyJSON['when']).getTime();
 				bodyJSON['timestamp'] = Date.now();
+				//Determine the category
+				var rideLat = bodyJSON.dest.geometry.coordinates[0];
+				var rideLon = bodyJSON.dest.geometry.coordinates[1];
+				var curCat = "Everywhere Else";
+				var curCatID = constants.EVERYWHERE_ELSE_CHANNEL_ID;
+				var curCatPriority = -1;
+				for (const category in constants.CATEGORIES){
+					var c = constants.CATEGORIES[category];
+					for(var i = 0; i < c.coordinates.length; i++){ //Categories can have multiple points
+						Logger.logDebug(`Dist from category ${category} (Priority: ${c.priority}, ID: ${c.channel}) is ${getDistance(rideLat, rideLon, c.coordinates[i][0], c.coordinates[i][1])}`)
+						if(getDistance(rideLat, rideLon, c.coordinates[i][0], c.coordinates[i][1]) < c.radius && c.priority > curCatPriority){
+							Logger.logDebug("Found a matching category!");
+							curCat = category;
+							curCatID = c.channel;
+							curCatPriority = c.priority;
+						}
+					}
+				}
+				bodyJSON["cat"] = curCat;
 				var re;
 				Logger.logDebug("Recieve data for ride type: " + bodyJSON.type);
 				if(bodyJSON.type == "request") {
@@ -203,7 +223,7 @@ http.createServer(function (req, res) {
 					re = new Offer(bodyJSON);
 				}
 				Logger.logDebug(re);
-				re.sendRideMessage(client, constants.CATEGORIES[bodyJSON["cat"]]).then(function(result) {
+				re.sendRideMessage(client, curCatID).then(function(result) {
 					if(re.message == null) {
 						Logger.logError("Error while processing ")
 						Logger.logError("Message did not send for some reason!");
@@ -303,9 +323,28 @@ function serveImage(path, contentType, res) {
 function findMatchingRideEvents(query, arr) {
 	result = [];
 	for (re in arr) {
-		if(arr[re].dest.includes(query)){
+		if(arr[re].destName.includes(query)){
 			result.push(arr[re]);
 		}
 	}
 	return result;
+}
+
+//Stack overflow code for coordinates
+function getDistance(lat1, lon1, lat2, lon2) {
+  var R = 3958.8; // Radius of the earth in miles
+  var dLat = deg2rad(lat2-lat1);  // deg2rad below
+  var dLon = deg2rad(lon2-lon1);
+  var a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+    ;
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  var d = R * c; // Distance in miles
+  return d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180)
 }

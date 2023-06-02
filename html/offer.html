@@ -4,18 +4,34 @@
         <link rel="stylesheet" href="styles.css"></link>
     </head>
     <body>
-        <h1 class="center">Offer A Ride</h1>
             <form id="rideform">
-                <ih>Category</ih>
-                <select name="cat" id="categorySelect" required>
-                </select>
-                <ih>Going To</ih>
-                <input name="dest" required></input>
+      <div id="searchPane">
+        <h1 id="searchTitle">Pick a Destination</h1>
+        <input id="searchBox" placeholder="Search for a different location" oninput="populateSuggestions()"></input>
+        <div id="suggestions"></div>
+      </div>
+      <div id="formPane">
+                <h1>Offer a Ride</h1>
+                <p class="requiredInd">(*) Required</p>
+                <ih>Going To <r>*</r></ih>
+                <div class="result" onclick="chooseTo()">
+                  <h2 id="toName"></h2>
+                  <span id="toFull"></span>
+                  <div class="changeCont">
+                    <span>Click to Change Location</span>
+                  </div>
+                </div>
                 <ih>Leaving From</ih>
-                <input name="whence" value="Rose-Hulman Institute of Technology"></input>
-                <ih>When</ih>
+                <div class="result" onclick="chooseFrom()">
+                  <h2 id="fromName"></h2>
+                  <span id="fromFull"></span>
+                  <div class="changeCont">
+                    <span>Click to Change Location</span>
+                  </div>
+                </div>
+                <ih>When <r>*</r></ih>
                 <input id="timeIn" type="datetime-local" required></input>
-                <ih>Vehicle Description</ih>
+                <ih>Vehicle Description <r>*</r></ih>
                 <input name="vehicleInfo" required></input>
                 <ih>Payment</ih>
                 <div class="checkCont">
@@ -25,11 +41,13 @@
                 <ih>Additional Info</ih>
                 <textarea name="info"></textarea>
                 <button class="bigGlowyButton">Create Offer!</button>
-            </form>
+        </div>
+      </form>
             <script src="forms.js"></script>
             <style>
             body {
                 background: transparent;
+                overflow-x: hidden;
             }
             </style>
         </body>

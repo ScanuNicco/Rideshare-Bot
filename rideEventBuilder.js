@@ -4,6 +4,7 @@ const constants = require("./constants.js");
 var LocalStorage = require('node-localstorage').LocalStorage;
 localStorage = new LocalStorage('./ridedata');
 const sanitizeHtml = require('sanitize-html');
+const Logger = require("./logger.js");
 
 function clean(dirty) {
     return sanitizeHtml(dirty, {
@@ -41,13 +42,16 @@ class RideEvent {
         this.timestamp = obj.timestamp;
         this.deleted = obj.deleted;
         this.target = obj.target;
-        this.dest = clean(obj.dest);
-        this.whence = clean(obj.whence);
+        this.dest = obj.dest;
+        this.whence = obj.whence;
         this.when = obj.when;
         this.payment = obj.payment;
         this.info = clean(obj.info);
         this.message = obj.message; //This is a Data Object, not the actual Message object that has functions and stuff. Use getMessageFromRideEvent() for that.
-        this.whencestring = this.whence != '' ? `from ${this.whence} ` : '';
+        this.destName = this.dest.properties.geocoding.name;
+        this.destDetails = this.dest.properties.geocoding.label.substring(this.destName.length + 2);
+        this.whenceName = this.whence.properties.geocoding.name;
+        this.whenceDetails = this.whence.properties.geocoding.label.substring(this.whenceName.length + 2);
         this.cat = obj.cat;
         this.status = obj.status ?? "No Status";
     }
@@ -83,8 +87,9 @@ class RideEvent {
     }
 
     async sendRideMessage(client, channelID) {
+        Logger.logDebug("Sending ride message in channel: " + channelID);
         var channel = await client.channels.fetch(channelID);
-        this.message = await channel.send(this.writeMessageText());
+        this.message = await channel.send(this.writeMessageText(), {"allowedMentions": { "users" : []}});
     }
 
     getTimeString() { //Returns the time as a sting in EASTERN TIME
@@ -111,18 +116,18 @@ class Offer extends RideEvent {
     }
 
     writeMessageText() {
-        const message = `**${this.target.username}** is offering a ride ${this.whencestring}to \`${this.dest}\` on \`${this.getTimeString()}\`.${(this.payment ? " They are requesting that you help cover the cost of parking/gas. " : "")}\n\nVehicle Info:\n${this.vehicleInfo}\n\n*Additional Info:*\n${(this.info ?? "None")}`;
+        const message = `<@${this.target.id}> is offering a ride from ${this.whenceName} to \`${this.destName}\` on \`${this.getTimeString()}\`.${(this.payment ? " They are requesting that you help cover the cost of parking/gas. " : "")}\n\nOrigin:\n${this.whence.properties.geocoding.label}\n\nDestination:\n${this.dest.properties.geocoding.label}\n\nVehicle Info:\n${this.vehicleInfo}\n\n*Additional Info:*\n${(this.info ?? "None")}`;
         return message;
     }
 
     writeUpdateText() {
-        const update = this.target.username + " is offering a ride " + this.whencestring + "to `" + this.dest + "` on `" + this.getTimeString() + "`. " + this.genRideLink() + "\n";
+        const update = this.target.username + " is offering a ride from " + this.whenceName+ " to `" + this.destName + "` on `" + this.getTimeString() + "`. " + this.genRideLink() + "\n";
         return update;
     }
 
     async cancel(client, interaction) {
         super.cancel(interaction);
-        await this.replaceWithStatus(client, `**${this.target.username}** has cancelled their ride offer to \`${this.dest}\`.`);
+        await this.replaceWithStatus(client, `**${this.target.username}** has cancelled their ride offer to \`${this.destName}\`.`);
         interaction.reply({content: 'Ride offer cancelled. Please be sure to inform anyone who was planning to ride with you!', ephemeral: true});
     }
 
@@ -140,7 +145,7 @@ class Offer extends RideEvent {
 					.setLabel('Cancel this Offer')
 					.setStyle(ButtonStyle.Danger),
 			);
-		const controls = await userDM.send({content: "**Handy Control Panel:** Ride offer for `" + this.dest + "`", components: [row]});
+		const controls = await userDM.send({content: "**Handy Control Panel:** Ride offer for `" + this.destName + "`", components: [row]});
         return controls.id;
     }
 
@@ -155,18 +160,18 @@ class Offer extends RideEvent {
 
 class Request extends RideEvent {
     writeMessageText() {
-        const message = `**${this.target.username}** is looking for a ride ${this.whencestring}to \`${this.dest}\` on \`${this.getTimeString()}\`.${(this.payment ? " They are offering to help cover the cost of parking/gas. " : "")}\n\n*Additional Info:*\n${(this.info ?? "None")}`;
+        const message = `<@${this.target.id}> is looking for a ride from ${this.whenceName} to \`${this.destName}\` on \`${this.getTimeString()}\`.${(this.payment ? " They are offering to help cover the cost of parking/gas. " : "")}\n\nOrigin:\n${this.whence.properties.geocoding.label}\n\nDestination:\n${this.dest.properties.geocoding.label}\n\n*Additional Info:*\n${(this.info ?? "None")}`;
         return message;
     }
 
     writeUpdateText() {
-        const update = this.target.username + " is looking for a ride " + this.whencestring + "to `" + this.dest + "` on `" + this.getTimeString() + "`. " + this.genRideLink() + "\n";
+        const update = this.target.username + " is looking for a ride from " + this.whenceName + " to `" + this.destName + "` on `" + this.getTimeString() + "`. " + this.genRideLink() + "\n";
         return update;
     }
 
     async cancel(client, interaction) {
         super.cancel(interaction);
-        await this.replaceWithStatus(client, `**${this.target.username}** has cancelled their request for a ride to \`${this.dest}\`.`);
+        await this.replaceWithStatus(client, `**${this.target.username}** has cancelled their request for a ride to \`${this.destName}\`.`);
         interaction.reply({content: 'Request cancelled. Please be sure to inform anyone who offered you a ride!', ephemeral: true});
     }
 
@@ -184,7 +189,7 @@ class Request extends RideEvent {
 					.setLabel('Cancel this Request')
 					.setStyle(ButtonStyle.Danger),
 			);
-		const controls = await userDM.send({content: "**Handy Control Panel:** Ride request for `" + this.dest + "`", components: [row]});
+		const controls = await userDM.send({content: "**Handy Control Panel:** Ride request for `" + this.destName + "`", components: [row]});
         return controls.id;
     }
 
