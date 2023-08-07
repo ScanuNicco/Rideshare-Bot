@@ -22,15 +22,11 @@ class RideCommandBuilder extends SlashCommandBuilder {
         this.name = name;
     }
 
-    static genLink(interaction, type) {
+    static genLink(interaction, type, urgent=false) {
         var states = JSON.parse(localStorage.getItem('states')) ?? {};
 		var uuid = uuidv4();
-        try {
-            var urgent = interaction.options.getBoolean("urgent");
-        } catch {
-            var urgent = false;
-        }
 		states[uuid] = {user: interaction.user, urgent: urgent};
+        Logger.logDebug("Saved state " + uuid + " for user " + interaction.user.username);
 		interaction.reply({content: `Here's your personal url:\n${constants.HOSTNAME}rideform.html?type=${type}&state=${uuid}`, ephemeral: true});
 		localStorage.setItem('states', JSON.stringify(states));
     }

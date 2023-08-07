@@ -6,6 +6,7 @@ module.exports = {
 		option.setName('urgent')
 			.setDescription('Only use this if you\'re really in a pinch!')),
 	execute(interaction) {
-		RideCommandBuilder.genLink(interaction, "request");
+		var urgent = interaction.options.getBoolean("urgent");
+		RideCommandBuilder.genLink(interaction, "request", urgent);
 	},
 };

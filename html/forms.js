@@ -1,8 +1,8 @@
-var timestamp = 0;
+/*var timestamp = 0;
 document.getElementById("timeIn").oninput = function() {
     timestamp = new Date(document.getElementById("timeIn").value).getTime();
     console.log(timestamp);
-}
+}*/
 
 
 document.getElementById("rideform").onsubmit = async function(e) {
@@ -13,9 +13,10 @@ document.getElementById("rideform").onsubmit = async function(e) {
     var formObject = Object.fromEntries(formData);
     formObject.stateID = parent.stateID;
     formObject.type = parent.type;
-    formObject.when = timestamp;
+    //formObject.whenRaw = timestamp;
     formObject.whence = from;
     formObject.dest = to;
+    //formObject.tz = document.getElementById("timeZone").value;
     const result = await fetch('/api/submitRideEvent', {
         method: 'POST',
         body: JSON.stringify(formObject),
@@ -65,6 +66,7 @@ document.getElementById("rideform").onsubmit = async function(e) {
       populateSuggestions().then(function() {
         from = currentFeatures[0];
       });
+      document.getElementById("timeZone").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
       function trimFullName(feature) {
         var output = feature.properties.geocoding.label.substring(feature.properties.geocoding.name.length + 2);

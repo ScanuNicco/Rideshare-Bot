@@ -231,3 +231,17 @@
       margin: 0px;
       color: firebrick;
     }
+
+    .timeCont {
+  display: flex;
+}
+#timeIn {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+#timeZone {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  box-shadow: none;
+  max-width: min-content;
+}

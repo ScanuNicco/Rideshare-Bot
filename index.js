@@ -7,8 +7,9 @@ var LocalStorage = require('node-localstorage').LocalStorage;
 var schedule = require('node-schedule');
 localStorage = new LocalStorage('./ridedata');
 const constants = require("./constants.js");
-const { Offer, Request } = require("./rideEventBuilder.js");
+const { RideCommandBuilder, Offer, Request } = require("./rideEventBuilder.js");
 const Logger = require("./logger.js");
+var moment = require('moment-timezone');
 
 var http = require('http');
 var qs = require('querystring');
@@ -79,7 +80,10 @@ client.on(Events.InteractionCreate, async function(interaction) {
 		client.commands.get("offer").execute(interaction);
 		return;
 	} else if(interaction.customId == 'newRequest'){
-		client.commands.get("request").execute(interaction);
+		RideCommandBuilder.genLink(interaction, "request", false);
+		return;
+	} else if(interaction.customId == 'newUrgentRequest'){
+		RideCommandBuilder.genLink(interaction, "request", true);
 		return;
 	}
 	var requests = Request.loadEvents();
@@ -194,7 +198,9 @@ http.createServer(function (req, res) {
 				//Fill in extra info needed for RideEvent Creation
 				bodyJSON['target'] = state['user'];
 				bodyJSON['payment'] = bodyJSON['payment'] == 'on';
-				bodyJSON['when'] = new Date(bodyJSON['when']).getTime();
+				Logger.logDebug("Attempting to create time " + bodyJSON['whenRaw'] + " in timezone " + bodyJSON['tz']);
+				bodyJSON['when'] = moment.tz(bodyJSON['whenRaw'], bodyJSON['tz']).valueOf();
+				Logger.logDebug(bodyJSON['when']);
 				bodyJSON['timestamp'] = Date.now();
 				//Determine the category
 				var rideLat = bodyJSON.dest.geometry.coordinates[0];

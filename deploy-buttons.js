@@ -22,6 +22,10 @@ client.once(Events.ClientReady, c => {
 					.setCustomId('newRequest')
 					.setLabel('Create Ride Request')
 					.setStyle(ButtonStyle.Primary),
+				new ButtonBuilder()
+					.setCustomId('newUrgentRequest')
+					.setLabel('Create Urgent Ride Request')
+					.setStyle(ButtonStyle.Danger),
 			);
         channel.send({content: "Use the buttons to create a new Offer or Request: \n", components: [row]});
     });

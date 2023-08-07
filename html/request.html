@@ -30,7 +30,17 @@
                   </div>
                 </div>
                 <ih>When <r>*</r></ih>
-                <input id="timeIn" type="datetime-local" required></input>
+                <div class="timeCont">
+                  <input id="timeIn"  name="whenRaw" type="datetime-local" required></input>
+                  <select id="timeZone" name="tz">
+                    <option value="Pacific/Honolulu">Hawaiian Time</option>
+                    <option value="America/Anchorage">Alaskan Time</option>
+                    <option value="America/Los_Angeles">Pacific Time</option>
+                    <option value="America/Denver">Mountain Time</option>
+                    <option value="America/Chicago">Central Time</option>
+                    <option value="America/New_York">Eastern Time</option>
+                  </select>
+                </div>
                 <ih>Payment</ih>
                 <div class="checkCont">
                 <input type="checkbox" name="payment"></input>

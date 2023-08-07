@@ -128,7 +128,7 @@
                     const json = await result.json();
                     console.log(json);
                     document.getElementById("profileDisplay").src = json.user.avatarURL;
-                    document.getElementById("nameText").innerText = json.user.tag;
+                    document.getElementById("nameText").innerText = json.user.globalName + " (@" + json.user.username + ")";
         }
         </script>
     </body>

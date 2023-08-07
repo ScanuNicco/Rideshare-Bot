@@ -1,0 +1,373 @@
+                html {
+                    height: 100vh;
+                }
+
+                body {
+                    margin: 0px;
+                    display: flex;
+                    height: 100%;
+                }
+
+                .headerBar {
+                    background: #333;
+                    position: fixed;
+                    top: 0px;
+                    left: 0px;
+                    width: 100vw;
+                    display: flex;
+                    box-shadow: 0px 3px 5px rgba(0, 0, 0, .2);
+                    z-index: 5;
+                }
+
+                .headerBar input {
+                    width: 100%;
+                }
+
+                .headerBar img {
+                    height: 50px;
+                    padding: 8px;
+                }
+
+                .headerBar a {
+                    transition-duration: .3s;
+                }
+
+                .headerBar a:hover {
+                    background: #555;
+                }
+
+                .headerBar button, .headerBar a {
+                    display: flex;
+                    align-items: center;
+                }
+
+                .headerBar button img {
+                    height: 28px;
+                    width: 28px;
+                    padding: 0px;
+                }
+
+                #tilesCont {
+                    display: flex;
+                    flex-wrap: wrap;
+                    width: 100%;
+                }
+
+                #filterCont {
+                    display: none;
+                    background: #151515;
+                    width: max-content;
+                    border-radius: 5px;
+                    box-shadow: 0px 0px 4px rgba(0, 0, 0, .4);
+                    padding: 15px;
+                    display: none;
+                    height: calc(100vh - 300px);
+                    min-height: 525px;
+                    position: sticky;
+                    top: 150px;
+                    margin: 20px;
+                    z-index: 3;
+                }
+
+                #filterCont h2 {
+                    text-align: center;
+                }
+
+                #filterCont h3 {
+                    margin-bottom: 10px;
+                }
+
+                #filterCont .styledInput {
+                    font-size: 12pt;
+                    min-width: 0px;
+                }
+
+                .rideCard {
+                    background: #2f2f2f;
+                    margin: 10px;
+                    border-radius: 5px;
+                    display: flex;
+                    transition-duration: .5s;
+                    height: 200px;
+                    min-height: min-content;
+                    overflow: hidden;
+                    transition: ease-in-out .2s;
+                    width: max-content;
+                }
+
+                .rideCard:hover {
+                    transform: scale(1.03);
+                }
+
+                .leftCol, .rightCol {
+                    flex-direction: column;
+                    display: inline-flex;
+                    margin: 15px;
+                }
+
+                .leftCol {
+                    align-items: center;
+                    padding: 15px;
+                    background: #444;
+                    margin: 0px;
+                }
+
+                .leftCol img {
+                    border-radius: 5px;
+                }
+
+                .rideCard h2 {
+                    margin: 0px 0px 10px 0px !important;
+                }
+
+                .rideCard h4, .rideCard h3, .rideCard span {
+                    margin: 5px 0px !important;
+                }
+
+                .rideCard span {
+                    display: block;
+                }
+
+                #modalBackground {
+                    position: fixed;
+                    z-index: 10;
+                    top: 100vh;
+                    left: 0px;
+                    background: rgba(0, 0, 0, .3);
+                    backdrop-filter: blur(15px);
+                    width: 100vw;
+                    height: 100vh;
+                    transition-duration: .5s;
+                    border-radius: 100px;
+                }
+
+                #modal {
+                    background: #333;
+                    margin: 10% auto;
+                    width: 75%;
+                    border-radius: 5px;
+                    padding: 15px;
+                }
+
+                #modal h1 {
+                    text-align: center;
+                }
+
+                #modal table {
+                    background: #222;
+                    margin: auto;
+                    border-radius: 5px;
+                    padding: 5px;
+                    width: 70%;
+                }
+
+                #modal td {
+                    line-height: 1.5;
+                    padding: 5px;
+                    color: #ddd;
+                }
+
+                .label {
+                    font-weight: bold;
+                    text-align: right;
+                    color: #a64dff !important;
+                    width: 120px;
+                }
+
+                #close {
+                    border: none;
+                    background: transparent;
+                    color: #eee;
+                    font-size: 36pt;
+                    position: absolute;
+                    top: 0px;
+                    right: 0px;
+                    border-radius: 0px;
+                    border-bottom-left-radius: 5px;
+                    padding: 0px 15px;
+                    transition-duration: .1s;
+                }
+
+                #close:hover {
+                    background: firebrick;
+                }
+
+                #loading {
+                    width: 200px;
+                    height: 200px;
+                    left: calc(50% - 100px);
+                    top: calc(50% - 50px);
+                    border: none;
+                    position: absolute;
+                }
+
+                #statusBox {
+                    background: #222;
+                    margin: 15px auto;
+                    width: 70%;
+                    border-radius: 5px;
+                    display: flex;
+                    overflow: hidden;
+                }
+
+                #statusLabel {
+                    background: #444;
+                    font-weight: bolder;
+                    padding: 12px;
+                }
+
+                #statusContent {
+                    padding: 12px;
+                }
+
+                #outerFilterCont {
+                    display: flex;
+                    margin: 0px;
+                    width: 100vw;
+                }
+
+                #viewSelector {
+                    background: #181818;
+                    padding-top: 81px;
+                    min-width: 50px !important;
+                    max-width: 50px !important;
+                    box-shadow: 0px 3px 3px rgba(0, 0, 0, .5);
+                    position: relative;
+                }
+
+                #viewSelector img {
+                    width: calc(100% - 20px);
+                    padding: 10px;
+                    transition-duration: .2s;
+                }
+
+                #viewSelector img:hover {
+                    background: #333;
+                }
+
+                #calendarCont {
+                    display: none;
+                    margin: 10px;
+                    --fc-button-bg-color: #b366ff;
+                    --fc-button-hover-bg-color: #bc7afe;
+                    --fc-border-color: #555;
+                    --fc-page-bg-color: transparent;
+                    --fc-list-event-hover-bg-color: #fff1;
+                }
+
+                #rideViewsCont {
+                    margin-top: 80px;
+                    flex-grow: 1;
+                    overflow-y: auto;
+                }
+
+                #filterButton {
+                    position: absolute;
+                    bottom: 20px;
+                    left: 0px;
+                }
+                .active {
+                    background: #b366ff;
+                }
+
+                @media screen and (max-width: 600px) {
+                    .headerBar button img {
+                        height: 22px;
+                        width: 22px;
+                    }
+
+                    #searchBar {
+                        font-size: 12pt;
+                        padding: 5px;
+                    }
+
+                    h2 {
+                        font-size: 14pt;
+                        line-height: 1.2;
+                    }
+
+                    div, td, th {
+                        line-height: 1.4;
+                    }
+
+                    #filterCont {
+                        position: absolute;
+                        top: 0px;
+                        left: 0px;
+                        width: calc(100% - 30px);
+                        height: 100%;
+                        background: #313131;
+                        text-align: center;
+                        margin: 116px 0px;
+                        border-radius: 0px;
+                        z-index: 4;
+                        box-shadow: 3px 0px 3px rgba(0, 0, 0, .5);
+                    }
+
+                    .styledInput {
+                        margin: auto;
+                        width: 80% !important;
+                    }
+
+                    .leftCol img {
+                        width: 96px;
+                    }
+
+                    #modal {
+                        border-radius: 0px;
+                        margin: 0px;
+                        width: initial;
+                    }
+
+                    #modal table, #statusBox {
+                        width: 90%;
+                    }
+
+                    #modalBackground {
+                        overflow-y: auto;
+                    }
+
+                    .rideCard {
+                        height: 300px;
+                        max-width: calc(100% - 20px);
+                    }
+
+                    #viewSelector {
+                        padding: 0px;
+                        margin-top: 66px;
+                        min-width: initial !important;
+                        max-width: initial !important;
+                        min-height: 50px !important;
+                        max-height: 50px !important;
+                    }
+
+                    #viewSelector img {
+                        height: calc(100% - 20px);
+                        padding: 10px;
+                        transition-duration: .2s;
+                        margin-top: 0px;
+                        width: initial;
+                    }
+
+                    #filterButton {
+                        position: absolute;
+                        left: initial;
+                        right: 0px;
+                        bottom: 0px;
+                    }
+
+                    #outerFilterCont {
+                        flex-direction: column;
+                    }
+
+                    #rideViewsCont {
+                        margin-top: 20px;
+                    }
+
+                    .fc-toolbar-title {
+                        font-size: 1.4em !important;
+                    }
+
+                    .fc-button-group{
+                        margin-left: .2em !important;
+                    }
