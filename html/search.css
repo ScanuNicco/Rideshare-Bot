@@ -130,7 +130,7 @@
 
                 #modalBackground {
                     position: fixed;
-                    z-index: 10;
+                    z-index: 1000;
                     top: 100vh;
                     left: 0px;
                     background: rgba(0, 0, 0, .3);
@@ -255,8 +255,19 @@
                     --fc-list-event-hover-bg-color: #fff1;
                 }
 
+                #mapCont {
+                    display: none;
+                    height: 100%;
+                    position: relative;
+                }
+
+                #map {
+                    width: 100%;
+                    height: 100%;
+                }
+
                 #rideViewsCont {
-                    margin-top: 80px;
+                    margin-top: 68px;
                     flex-grow: 1;
                     overflow-y: auto;
                 }
@@ -268,6 +279,52 @@
                 }
                 .active {
                     background: #b366ff;
+                }
+
+                img.offerPin {
+                    filter: hue-rotate(256deg);
+                }
+                
+
+                #toolbarCont {
+                    position: absolute;
+                    left: 5px;
+                    bottom: 5px;
+                    z-index: 999;
+                }
+
+                .mapToolbar {
+                    padding: 2px;
+                    background: rgba(0,0,0,0.2);
+                    border-radius: 5px;
+                    overflow: hidden;
+                    display: flex;
+                    gap: 1px;
+                }
+
+                .mapToolbar span {
+                    background: #f4f4f4;
+                    color: black;
+                    padding: 0px 30px;
+                    transition: ease .2s;
+                }
+
+                .mapToolbar span:hover {
+                    background: #ddd;
+                }
+
+                .left-rounded {
+                    border-top-left-radius: 5px;
+                    border-bottom-left-radius: 5px;
+                }
+
+                .right-rounded {
+                    border-top-right-radius: 5px;
+                    border-bottom-right-radius: 5px;
+                }
+
+                .map-tab-active {
+                    background: #f5d3ff !important;
                 }
 
                 @media screen and (max-width: 600px) {
@@ -361,7 +418,7 @@
                     }
 
                     #rideViewsCont {
-                        margin-top: 20px;
+                        margin-top: 0px;
                     }
 
                     .fc-toolbar-title {

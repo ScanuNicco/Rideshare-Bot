@@ -5,8 +5,9 @@
         <link rel="icon" href="slowlane.png"></link>
         <link rel="stylesheet" href="styles.css"></link>
         <link rel="stylesheet" href="search.css"></link>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""></link>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-	<meta name="description" content="Search for a ride.">
+	    <meta name="description" content="Search for a ride.">
     </head>
     <body>
         <div class="headerBar">
@@ -17,9 +18,10 @@
             <div id="viewSelector">
                 <img class="active" src="tileView.svg" onclick="showView(0)">
                 <img src="calendarView.svg" onclick="showView(1)" class="">
+                <img src="mapView.svg" onclick="showView(2)">
                 <img id="filterButton" src="filter.svg" onclick="toggleFilter()">
             </div>
-            <div id="filterCont" onclick="generateHTML()">
+            <div id="filterCont" onclick="populateCurrentView()">
             <h2>Filter Results</h2>
             <h3>Type</h3>
             <div class="checkCont">
@@ -29,9 +31,9 @@
                 <input type="checkbox" class="styledCheckbox" checked id="requestBox"></input><label>Requests</label>
             </div>
             <h3>Date Range</h3>
-            <input type="datetime-local" class="styledInput" id="rangeStart" onchange="generateHTML()" style="width: calc(100% - 10px);"></input><br>
+            <input type="datetime-local" class="styledInput" id="rangeStart" onchange="populateCurrentView()" style="width: calc(100% - 10px);"></input><br>
             <p style="margin:auto; text-align: center">To</p>
-            <input type="datetime-local"  class="styledInput" id="rangeEnd" onchange="generateHTML()" style="width: calc(100% - 10px);"></input><br>
+            <input type="datetime-local"  class="styledInput" id="rangeEnd" onchange="populateCurrentView()" style="width: calc(100% - 10px);"></input><br>
             <h3>Category</h3>
             <select id="catSelect" class="styledInput">
                 <option value="">All Categories</option>
@@ -41,6 +43,15 @@
             <div id="rideViewsCont">
             <div id="tilesCont"></div>
             <div id="calendarCont"></div>
+            <div id="mapCont">
+                <div id="map"></div>
+                <div id="toolbarCont">
+                    <div class="mapToolbar" id="mapToggle">
+                        <span class="left-rounded" onclick="originPins()">Origin</span>
+                        <span class="right-rounded  map-tab-active" onclick="destPins()">Destination</span>
+                    </div>
+                </div>
+            </div>
             </div>
         <div id="modalBackground">
             <button id="close" onclick="closeModal()">&times;</button>
@@ -68,6 +79,8 @@
         </div>
         <script src="/fullcalendar/dist/index.global.min.js"></script>
         <script src="shared.js"></script>
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/OverlappingMarkerSpiderfier-Leaflet/0.2.6/oms.min.js"></script>
         <script>
 
 
@@ -75,6 +88,9 @@
                 var rideEvents;
                 var calenderEl;
                 var calender;
+                var map;
+                var mlg;
+                var oms;
 
                 window.onload = async function() {
                     q = getUrlVars()['q'];
@@ -94,13 +110,27 @@
                         html += `<option>${rideEvents[2][i]}</option>`;
                     }
                     document.getElementById("catSelect").innerHTML += html;
-                    resetFilter();
                     changeViewCaledar()
 
                     window.addEventListener("resize", () => {
                         changeViewCaledar()
                     });
+
+                    map = L.map('map').setView([39.48292, -88], 7);
+                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 20,
+                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                        detectRetina: true
+                    }).addTo(map);
+
+                    mlg = L.layerGroup().addTo(map);
+
+                    oms = new OverlappingMarkerSpiderfier(map);
+                    oms.addListener('click', showRideFromMarker);
+
+                    resetFilter();
                 }
+
 
                 const changeViewCaledar = () => {
                     if (document.body.clientWidth < 600) {
@@ -119,7 +149,7 @@
                     const json = await result.json();
                     console.log(json);
                     rideEvents = json;
-                    generateHTML();
+                    populateCurrentView();
                 }
 
                 function searchNow() {
@@ -131,8 +161,25 @@
                     window.history.pushState('page2', 'Title', '/search.html?q=' + query);
                 }
 
-                function generateHTML() {
-                    html = "";
+                var tilesHTML;
+                function showTiles() {
+                    tilesHTML = "";
+                    displayRides(generateHTML);
+                    document.getElementById("tilesCont").innerHTML = tilesHTML;
+                    document.getElementById("loading").style.display = 'none';
+                }
+
+                function generateHTML(type, ind, re) {
+                    var date = new Date(re.when).toLocaleString();
+                    re.dateObj = date;
+                    if(type == "offer"){
+                        tilesHTML += `<div class='rideCard' onclick="showOffer(${ind})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${trimToLength(re.destName)}</h2><span><b>From:</b> ${re.whenceName ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
+                    } else {
+                        tilesHTML += `<div class='rideCard' onclick="showRequest(${ind})"><div class='leftCol'><img src=${re.target.avatarURL ?? "noPic.svg"}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.destName)}</h2><span><b>From:</b> ${re.whenceName ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;   
+                    }
+                }
+
+                function displayRides(handler) {
                     if(document.getElementById("offersBox").checked){
                         calendar.removeAllEvents();
                         for(off in rideEvents[1]) {
@@ -140,16 +187,9 @@
                             if(passesFilters(re)){
                                 var date = new Date(re.when).toLocaleString();
                                 re.dateObj = date;
-                                html += `<div class='rideCard' onclick="showOffer(${off})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${trimToLength(re.destName)}</h2><span><b>From:</b> ${re.whenceName ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
-                                calendar.addEvent({
-                                    title: re.destName,
-                                    start: re.when,
-                                    extendedProps: {type: "offer", index: off},
-                                    color: "rgb(137, 220, 137)"
-                                });
+                                handler("offer", off, re);
                             }
                         }
-                        //calendar.render();
                     }
                     if(document.getElementById("requestBox").checked){
                         for(req in rideEvents[0]) {
@@ -157,18 +197,10 @@
                             if(passesFilters(re)){
                                 var date = new Date(re.when).toLocaleString();
                                 re.dateObj = date;
-                                html += `<div class='rideCard' onclick="showRequest(${req})"><div class='leftCol'><img src=${re.target.avatarURL ?? "noPic.svg"}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.destName)}</h2><span><b>From:</b> ${re.whenceName ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;
-                                calendar.addEvent({
-                                    title: re.destName,
-                                    start: re.when,
-                                    extendedProps: {type: "request", index: req},
-                                    color: "rgb(87, 189, 220)"
-                                });
+                                handler("request", req, re);
                             }
                         }
                     }
-                    document.getElementById("tilesCont").innerHTML = html;
-                    document.getElementById("loading").style.display = 'none';
                 }
 
                 function trimToLength(string) {
@@ -243,25 +275,77 @@
                     document.getElementById("offersBox").checked = true;
                     document.getElementById("requestBox").checked = true;
                     document.getElementById("catSelect").value = "";
-                    generateHTML();
+                    populateCurrentView();
                 }
 
-                var views = ["tilesCont", "calendarCont"]; //Add view IDs to this list in the order the appear in the selector
+                var views = [{id: "tilesCont", setup: showTiles}, {id: "calendarCont", setup: showCalendar}, {id: "mapCont", setup: showMap}]; //Add view IDs to this list in the order the appear in the selector
+                var currentView = 0;
                 function showView(id) {
                     var viewSelectCont = document.getElementById("viewSelector");
                     for(var i = 0; i < views.length; i++){
-                        document.getElementById(views[i]).style.display = "none";
+                        document.getElementById(views[i].id).style.display = "none";
                         viewSelectCont.children[i].classList.remove("active");
                     }
-                    document.getElementById(views[id]).style.display = "flex";
+                    document.getElementById(views[id].id).style.display = "flex";
                     viewSelectCont.children[id].classList.add("active");
                     calendar.render();
+                    views[id].setup();
+                    currentView = id;
+                }
+
+                function populateCurrentView() {
+                    views[currentView].setup();
+                }
+
+                function showMap() {
+                    map.invalidateSize();
+                    oms.clearMarkers();
+                    mlg.clearLayers();
+                    displayRides(mapGenerator);
+                }
+
+                function mapGenerator(type, ind, re) {
+                    var coords;
+                    if(pinsAtDest){
+                        coords = [re.dest.geometry.coordinates[1], re.dest.geometry.coordinates[0]];
+                    } else {
+                        coords = [re.whence.geometry.coordinates[1], re.whence.geometry.coordinates[0]];
+                    }
+                    var marker = L.marker(coords).addTo(mlg);
+                    marker.rideType = type;
+                    marker.rideInd = ind;
+                    if(type == "offer"){
+                        marker._icon.classList.add("offerPin");
+                    }
+                    oms.addMarker(marker);
+                }
+
+                function showCalendar() {
+                    calendar.removeAllEvents();
+                    displayRides(calGenerator);
+                }
+
+                function calGenerator(type, ind, re){
+                    calendar.addEvent({
+                        title: re.destName,
+                        start: re.when,
+                        extendedProps: {type: type, index: ind},
+                        color: type == "offer" ? "rgb(137, 220, 137)" : "rgb(87, 189, 220)"
+                    });
+                }
+
+                function showRideFromMarker(marker){
+                    if(marker.rideType == "request"){
+                        showRequest(marker.rideInd);
+                    } else {
+                        showOffer(marker.rideInd);
+                    }
                 }
 
                 function toggleFilter() {
                     var filterCont = document.getElementById("filterCont");
                     var filterButton = document.getElementById("filterButton");
-                    if(filterCont.style.display == "none"){
+                    if(filterCont.style.display != "block"){
                         filterCont.style.display = "block"
                         filterButton.classList.add("active");
                     } else {
@@ -280,7 +364,22 @@
                         showRequest(info.event.extendedProps.index);
                     }
                 }
+                var pinsAtDest = true;
+                function originPins() {
+                    var mapToggle = document.getElementById("mapToggle");
+                    mapToggle.children[0].classList.add("map-tab-active");
+                    mapToggle.children[1].classList.remove("map-tab-active");
+                    pinsAtDest = false;
+                    populateCurrentView();
+                }
 
+                function destPins() {
+                    var mapToggle = document.getElementById("mapToggle");
+                    mapToggle.children[1].classList.add("map-tab-active");
+                    mapToggle.children[0].classList.remove("map-tab-active");
+                    pinsAtDest = true;
+                    populateCurrentView();
+                }
             </script>
         </body>
     </html>
