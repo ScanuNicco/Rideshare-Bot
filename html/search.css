@@ -327,6 +327,18 @@
                     background: #f5d3ff !important;
                 }
 
+                #lhCont {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .lightHouse {
+                    max-width: 80%;
+                }
+
                 @media screen and (max-width: 600px) {
                     .headerBar button img {
                         height: 22px;

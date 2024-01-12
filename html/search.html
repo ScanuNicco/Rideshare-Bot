@@ -165,6 +165,9 @@
                 function showTiles() {
                     tilesHTML = "";
                     displayRides(generateHTML);
+                    if(tilesHTML == ""){ //There were no rides
+                            tilesHTML = "<div id='lhCont'><img src='noRides.svg' class='lighthouse'></img></div>";
+                    }
                     document.getElementById("tilesCont").innerHTML = tilesHTML;
                     document.getElementById("loading").style.display = 'none';
                 }
@@ -268,13 +271,8 @@
                 }
 
                 function resetFilter() {
-                    var now = new Date();
-                    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-                    document.getElementById("rangeStart").value = now.toISOString().slice(0,16);
-                    document.getElementById("rangeEnd").value = "";
-                    document.getElementById("offersBox").checked = true;
-                    document.getElementById("requestBox").checked = true;
-                    document.getElementById("catSelect").value = "";
+                    var boxes = document.getElementById("mainFiltersList").getElementsByQuerySelector("input[type=checkbox]");
+                    console.log(boxes);
                     populateCurrentView();
                 }
 
