@@ -1,5 +1,5 @@
 exports.UPDATE_CHANNEL_ID = "1043644962941702244"; //Channel ID where daily updates are sent
-exports.VERSION = "1.6"; //Bot Version Number
+exports.VERSION = "2.0"; //Bot Version Number
 exports.VERBOSE = true; //Print extra info for debugging. This should be set to false for production environments
 exports.HOSTNAME = "http://localhost:8081/"; //Where is the bot hosted. This should be in the form of https://example.com/
 exports.CATEGORIES = { //Each one contains center coordinates, a radius that includes that category, a Discord Channel ID, and a priority

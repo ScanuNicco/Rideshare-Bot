@@ -1,10 +1,13 @@
 {
   "dependencies": {
     "discord.js": "^14.6.0",
+    "dotenv": "^16.3.1",
     "fullcalendar": "^6.1.8",
     "moment-timezone": "^0.5.43",
     "node-localstorage": "^2.2.1",
     "node-schedule": "^2.1.0",
+    "pg": "^8.11.3",
+    "pg-prepared": "^2.5.13",
     "sanitize-html": "^2.10.0",
     "uuid": "^9.0.0"
   }

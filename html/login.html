@@ -1,0 +1,9 @@
+<html>
+    <h1>Log in</h1>
+    <input id="stateIn" placeholder="Input State ID"><button onclick="storeState()">Log In</button>
+    <script>
+        function storeState() {
+            localStorage.setItem('state', document.getElementById('stateIn').value);
+        }
+    </script>
+</html>

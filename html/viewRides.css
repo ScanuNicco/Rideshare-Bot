@@ -1,0 +1,44 @@
+body {
+    margin: 0px;
+}
+
+#sideBySide {
+    margin-top: 68px;
+    display: flex;
+    height: calc(100vh - 68px);
+    overflow: hidden;
+}
+
+#myRidesCont {
+    height: 100%;
+    overflow: auto;
+    width: 50%;
+}
+
+#rideEdit {
+    border: none;
+    width: 50%;
+    background: #2f2f2f;
+    margin: 5px 10px;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.viewerCard {
+    padding: 10px;
+    background: #2f2f2f;
+    margin: 5px 15px;
+    border-radius: 5px;
+    transition-duration: .3s;
+}
+
+.viewerCard:hover {
+    transform: scale(1.03);
+    background: #333;
+}
+
+.rideTitle {
+    font-weight: bold;
+    font-size: 15pt;
+    line-height: 1.5;
+}

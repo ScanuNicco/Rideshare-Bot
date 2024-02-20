@@ -1,15 +1,16 @@
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, EmbedBuilder } = require('discord.js');
-const { token } = require('./config.json');
+require('dotenv').config();
 const fs = require('node:fs');
 const path = require('node:path');
 var LocalStorage = require('node-localstorage').LocalStorage;
 var schedule = require('node-schedule');
 localStorage = new LocalStorage('./ridedata');
 const constants = require("./constants.js");
-const { RideCommandBuilder, Offer, Request } = require("./rideEventBuilder.js");
+const { RideCommandBuilder, Offer, Request, RideEvent } = require("./rideEventBuilder.js");
 const Logger = require("./logger.js");
-var moment = require('moment-timezone');
+const api = require('./api.js');
+const pg = require('./connectPostgres.js');
 
 var http = require('http');
 var qs = require('querystring');
@@ -86,25 +87,19 @@ client.on(Events.InteractionCreate, async function(interaction) {
 		RideCommandBuilder.genLink(interaction, "request", true);
 		return;
 	}
-	var requests = Request.loadEvents();
-	var offers = Offer.loadEvents();
 	const panelID = interaction.message.id;
+	Logger.logDebug(panelID);
 	//Rides are stored under their respective panel ID, so load the correct ride
-	var rdEvtData = requests[panelID] ?? offers[panelID];
 	var rdEvt;
-	if (panelID in requests) { //This could be a one-liner but for the sake of readability I won't. const rdEvt = panelID in requests ? new Request() : new Offer();
-		rdEvt = new Request(rdEvtData);
-		requests[panelID] = rdEvt;
-		//Now, convert the stored "data object" into a proper RideEvent
-	} else if (panelID in offers) {
-		rdEvt = new Offer(rdEvtData);
-		offers[panelID] = rdEvt;
-		//Now, convert the stored "data object" into a proper RideEvent
-	} else {
-		console.log("Ride not found!");
+	try {
+		rdEvt = await RideEvent.getRideByPanelId(panelID);
+	} catch (e) {
+		Logger.logDebug("Ride not found!");
+		Logger.logDebug(e);
 		interaction.reply({content: "ERROR: RideEvent not found! Please contact @ScanuRag#2531"});
 		return;
 	}
+	Logger.logDebug(rdEvt);
 	if(interaction.customId == 'cancelReq' || interaction.customId == 'cancelOff') { //The user clicked a cancel button
 		if(rdEvt.deleted !== true){
 			rdEvt.cancel(client, interaction);
@@ -140,18 +135,21 @@ client.on(Events.InteractionCreate, async function(interaction) {
 		if(rdEvt.deleted !== true){
 			await rdEvt.appendStatus(client, interaction.fields.getTextInputValue('statusInput'), false);
 			interaction.reply({content: 'Status updated', ephemeral: true});
-			Logger.logDebug("Status saved");
+			Logger.logDebug("Status saved for ride with id " + rdEvt.rideid);
 		} else {
 			interaction.reply({content: 'ERROR: Cannot update status of cancelled request', ephemeral: true});
 		}
+	} else if(interaction.customId = 'editRide') {
+		//console.log(rdEvtData);
+		const state = await RideCommandBuilder.genState(interaction);
+		interaction.reply({content: `Click here to edit your Ride: ${constants.HOSTNAME}viewRides.html?rideId=${rdEvt.rideid}&state=${state}`, ephemeral: true});
 	}
-	Request.saveEvents(requests);
-	Offer.saveEvents(offers);
+	/*Request.saveEvents(requests);
+	Offer.saveEvents(offers);*/
 });
 
 // Log in to Discord with your client's token
-client.login(token);
-
+client.login(process.env.TOKEN);
 // Create web server
 http.createServer(function (req, res) {
 	if(req.url.indexOf('../') > 0) {
@@ -172,99 +170,45 @@ http.createServer(function (req, res) {
 			Logger.logDebug('Recieved Data: ' + body);
 			var bodyJSON = JSON.parse(body);
 			Logger.logDebug('Processing POST request for: ' + req.url);
-			if(req.url == "/api/query") {
-				res.writeHead(200, {'Content-Type': 'application/json'});
-				var requests = JSON.parse(localStorage.getItem('requests')) ?? {};
-				var offers = JSON.parse(localStorage.getItem('rides')) ?? {};
-				var query = bodyJSON['Query'];
-				res.end(`[${JSON.stringify(findMatchingRideEvents(query, requests))}, ${JSON.stringify(findMatchingRideEvents(query, offers))}, ${JSON.stringify(Object.keys(constants.CATEGORIES))}]`);
-			} else if(req.url == "/api/getState") {
-				res.writeHead(200, {'Content-Type': 'application/json'});
-				var states = JSON.parse(localStorage.getItem('states')) ?? {};
-				var state = states[bodyJSON['stateID']] ?? {error: "State " + bodyJSON.stateID + " not found"};
-				res.end(JSON.stringify(state));
-			} else if(req.url == "/api/getCategories") {
-				res.writeHead(200, {'Content-Type': 'application/json'});
-				res.end(JSON.stringify(Object.keys(constants.CATEGORIES)));
-			} else if(req.url == "/api/submitRideEvent") {
-				var states = JSON.parse(localStorage.getItem('states')) ?? {};
-				var state = states[bodyJSON['stateID']];
-				if(state == null || state == undefined) {
-					res.writeHead(422, {'Content-Type': 'application/json'});
-					res.end("Invalid state! Please genereate a new link using the discord commands");
-					Logger.logDebug("Ride form submitted with invalid state!");
-					return;
-				}
-				//Fill in extra info needed for RideEvent Creation
-				bodyJSON['target'] = state['user'];
-				bodyJSON['payment'] = bodyJSON['payment'] == 'on';
-				Logger.logDebug("Attempting to create time " + bodyJSON['whenRaw'] + " in timezone " + bodyJSON['tz']);
-				bodyJSON['when'] = moment.tz(bodyJSON['whenRaw'], bodyJSON['tz']).valueOf();
-				Logger.logDebug(bodyJSON['when']);
-				bodyJSON['timestamp'] = Date.now();
-				//Determine the category
-				var rideLat = bodyJSON.dest.geometry.coordinates[0];
-				var rideLon = bodyJSON.dest.geometry.coordinates[1];
-				var curCat = "Everywhere Else";
-				var curCatID = constants.EVERYWHERE_ELSE_CHANNEL_ID;
-				var curCatPriority = -1;
-				for (const category in constants.CATEGORIES){
-					var c = constants.CATEGORIES[category];
-					for(var i = 0; i < c.coordinates.length; i++){ //Categories can have multiple points
-						Logger.logDebug(`Dist from category ${category} (Priority: ${c.priority}, ID: ${c.channel}) is ${getDistance(rideLat, rideLon, c.coordinates[i][0], c.coordinates[i][1])}`)
-						if(getDistance(rideLat, rideLon, c.coordinates[i][0], c.coordinates[i][1]) < c.radius && c.priority > curCatPriority){
-							Logger.logDebug("Found a matching category!");
-							curCat = category;
-							curCatID = c.channel;
-							curCatPriority = c.priority;
-						}
-					}
-				}
-				bodyJSON["cat"] = curCat;
-				var re;
-				Logger.logDebug("Recieve data for ride type: " + bodyJSON.type);
-				if(bodyJSON.type == "request") {
-					re = new Request(bodyJSON);
-				} else {
-					re = new Offer(bodyJSON);
-				}
-				Logger.logDebug(re);
-				re.sendRideMessage(client, curCatID).then(function(result) {
-					if(re.message == null) {
-						Logger.logError("Error while processing ")
-						Logger.logError("Message did not send for some reason!");
-					}
-					if(state.urgent) {
-						const message = re.writeUpdateText();
-						const update = new EmbedBuilder()
-							.setColor(0x0099FF)
-							.setTitle(":rotating_light: Urgent Request :rotating_light:")
-							.addFields({name: "Details:", value: message}, {name: "Additional Info:", value: (re.info ?? "None")});
-						client.channels.fetch(constants.UPDATE_CHANNEL_ID).then(function (channel){
-							channel.send({content: "<@&1027782166811254805>", embeds: [update]});
-						});
-					}
-					re.sendControls(client).then(function (result) {
-						if(bodyJSON.type == "request") {
-							Logger.logDebug(result);
-							var requests = JSON.parse(localStorage.getItem('requests')) ?? [];
-							requests[result] = re;
-							localStorage.setItem('requests', JSON.stringify(requests));
+			try { //If something within the API breaks, don't crash the entire server
+				if(req.url == "/api/query") {
+					res.writeHead(200, {'Content-Type': 'application/json'});
 
-						} else {
-							var offers = JSON.parse(localStorage.getItem('rides')) ?? [];
-							offers[result] = re;
-							localStorage.setItem('rides', JSON.stringify(offers));
-						}
-						res.writeHead(201, {'Content-Type': 'application/json'});
-						res.end(JSON.stringify({status: 'Success'}));
-					});
-				});
-			} else {
-				res.writeHead(404, {'Content-Type': 'text/html'});
-				Logger.logDebug("Not Found: " + req.url);
+					//Old Query
+					//var requests = JSON.parse(localStorage.getItem('requests')) ?? {};
+					//var offers = JSON.parse(localStorage.getItem('rides')) ?? {};
+					//var query = bodyJSON['Query'];
+					//res.end(`[${JSON.stringify(requests)}, ${JSON.stringify(offers)}, ${JSON.stringify(Object.keys(constants.CATEGORIES))}]`); //Not original, used for testing
+					//res.end(`[${JSON.stringify(findMatchingRideEvents(query, requests))}, ${JSON.stringify(findMatchingRideEvents(query, offers))}, ${JSON.stringify(Object.keys(constants.CATEGORIES))}]`);
+					
+					api.search(bodyJSON, res);
+				} else if(req.url == "/api/getCategories") {
+					res.writeHead(200, {'Content-Type': 'application/json'});
+					res.end(JSON.stringify(Object.keys(constants.CATEGORIES)));
+				} else if(req.url == "/api/getLoginInfo") {
+					api.getLoginInfo(client, bodyJSON, res);
+				} else if(req.url == "/api/getRidesByUser") {
+					api.getRidesByUser(bodyJSON, res);
+				} else if(req.url == "/api/viewSingleRide") {
+					api.viewSingleRide(bodyJSON, res);
+				} else if(req.url == "/api/editRides") {
+					api.editRides(client, bodyJSON, res);
+				} else if(req.url == "/api/submitRideEvent") {
+					api.submitRideEvent(client, bodyJSON, res);
+				} else if (req.url == "/api/userInServer") {
+					api.userInServer(client, bodyJSON, res);
+				} else {
+					res.writeHead(404, {'Content-Type': 'text/html'});
+					Logger.logDebug("Not Found: " + req.url);
+					// End the response
+					res.end('{"error": "Endpoint not found!", "errorCode": 404}');
+				}
+			} catch(e) {
+				res.writeHead(500, {'Content-Type': 'text/html'});
+				Logger.logError("Error while handling request to: " + req.url);
+				Logger.logError(e);
 				// End the response
-				res.end('Endpoint not found!');
+				res.end('{"error": "Internal server error!", "errorCode": 500}');
 			}
 		});
 	} else if (req.method == 'GET') {
@@ -323,30 +267,4 @@ http.createServer(function (req, res) {
 function serveImage(path, contentType, res) {
 	res.writeHead(200, {'Content-Type': contentType});
 	fs.createReadStream(path).pipe(res);
-}
-
-//query
-function findMatchingRideEvents(query, arr) {
-	result = [];
-	for (re in arr) {
-		if(arr[re].destName.includes(query)){
-			result.push(arr[re]);
-		}
-	}
-	return result;
-}
-
-//Stack overflow code for coordinates
-function getDistance(lat1, lon1, lat2, lon2) {
-  var R = 3958.8; // Radius of the earth in miles
-  var d = R * Math.acos(Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(lon1 - lon2)));
-  return d;
-}
-
-function deg2rad(deg) {
-  return deg * (Math.PI/180);
-}
-
-function rad2deg(rad) {
-	return (rad * 180)/Math.PI;
 }

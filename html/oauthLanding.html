@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rose Rideshares</title>
+        <link rel="icon" href="slowlane.png"></link>
+        <link rel="stylesheet" href="styles.css"></link>
+	<meta name="description" content="Ride sharing website for students at Rose-Hulman Institute of Technology">
+    </head>
+<body>
+
+<script src="shared.js"></script>
+<iframe id="loading" src="loading.svg"></iframe>
+<h1 id="mainText" class="center" style="display: none;">Loading...</h1>
+<div id="flex">
+<a id="serverLink" href="https://discord.gg/UjXkkdCzDZ">
+    <button class="dButton">Join the Discord Server here!</button>
+</a>
+</div>
+
+<script>
+	window.onload = async function() {
+        const params = new URLSearchParams(document.location.search);
+
+        const data = await userInServer(params.get("code"));
+        console.log(data);
+
+		if (data["createstate"]) {
+            localStorage.setItem('state', data["createstate"]);
+            window.location.href = "/viewRides.html";
+        } else {
+            document.getElementById("mainText").style.display = "unset";
+            document.getElementById("mainText").innerHTML = "You need to join the Rose Rideshares Discord Server:";
+            document.getElementById("serverLink").visability = "visable";
+        }
+	};
+</script>
+
+</body>
+</head>
+</html>

@@ -1,0 +1,12 @@
+GRANT EXECUTE ON PROCEDURE newride TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON discordmessage TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON discordmessage_id_seq TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON ridelocation TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON location_id_seq TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON rideevent TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON rideevent_id_seq TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON riderequest TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON rideoffer TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON discorduser TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON discorduser_id_seq TO ridesharebot;
+GRANT SELECT, INSERT, UPDATE ON state TO ridesharebot;

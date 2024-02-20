@@ -1,12 +1,56 @@
 @import url('https://fonts.googleapis.com/css2?family=Mandali&display=swap');
 
+:root {
+  --nav-height: 76px;
+}
+
                 body {
                     background: #222;
                     color: #eee;
                     font-family: 'Mandali', serif;
                 }
 
-                .headerBar button, #fancyHeader button {
+                .headerBar {
+                  background: #333;
+                  position: fixed;
+                  top: 0px;
+                  left: 0px;
+                  width: 100vw;
+                  height: var(--nav-height);
+                  display: flex;
+                  box-shadow: 0px 3px 5px rgba(0, 0, 0, .2);
+                  z-index: 5;
+                }
+
+                .headerBar input {
+                    width: 100%;
+                }
+
+                .headerBar img, .floatingLogin img {
+                    height: 50px;
+                    padding: 8px;
+                }
+
+                .headerBar a, .floatingLogin a {
+                    transition-duration: .3s;
+                }
+
+                .headerBar a:hover, .floatingLogin a:hover{
+                    background: #555;
+                }
+
+                .headerBar button, .headerBar a, .floatingLogin button, .floatingLogin a {
+                    display: flex;
+                    align-items: center;
+                }
+
+                .headerBar button img, .floatingLogin button img {
+                    height: 28px;
+                    width: 28px;
+                    padding: 0px;
+                }
+
+                .headerBar button, #fancyHeader button, .floatingLogin button {
                     background: #555;
                     color: #eee;
                     box-shadow: 0px 0px 3px rgba(0, 0, 0, .3);
@@ -33,6 +77,25 @@
                 .purpleButton {
                     background: #a64dff !important;
                     box-shadow: 0px 0px 3px #a64dff;
+                }
+
+                .dButton {
+                  margin: 20px 15% 20px 15%;
+                  padding: 15px;
+                  font-size: 20pt;
+                  background: #5865f2 !important;
+                  color: #eee;
+                  border-radius: 5px;
+                  border: none;
+                  transition-duration: .2s;
+                  text-align: center;
+                }
+
+                #flex {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  visibility: hidden;
                 }
 
                 button:hover {
@@ -244,4 +307,84 @@
   border-bottom-left-radius: 0;
   box-shadow: none;
   max-width: min-content;
+}
+
+#loginBox {
+  display: flex;
+  background: #444;
+  align-items: center;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  box-shadow: -2px 0px 2px #0003;
+  height: 100%;
+  text-align: left;
+}
+
+#loginBox h3 {
+  margin: 2px 0px;
+}
+
+.loginPic {
+  border-radius: 5px;
+  padding: 0px;
+  margin: 5px;
+  height: 58px;
+}
+
+.ddContent {
+  max-height: 0px;
+  overflow: hidden;
+  transition-duration: .5s;
+  background: #444;
+  box-shadow: -2px 0px 2px #0003;
+}
+
+.dropdown:hover {
+  /*background: #444;*/
+}
+
+.dropdown:hover:not(.ddNoOpen) .ddContent {
+  max-height: 250px;
+  border-bottom-left-radius: 5px;
+}
+
+.dropdown:hover:not(.ddNoOpen).floatingLogin .ddContent {
+  border-bottom-right-radius: 5px;
+}
+
+.dropdown:hover:not(.ddNoOpen) .ddLabel {
+  border-bottom-left-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+}
+
+.ddContent a {
+  padding: 10px 15px;
+  color: white;
+  text-decoration: none;
+}
+
+.dropDownInd {
+  height: 20px !important;
+  margin-left: 10px;
+}
+
+.floatingLogin {
+  height: var(--nav-height);
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  width: min-content;
+}
+
+.floatingLogin #loginBox {
+  border-radius: 10px;
+}
+
+#loading {
+  width: 200px;
+  height: 200px;
+  left: calc(50% - 100px);
+  top: calc(50% - 50px);
+  border: none;
+  position: absolute;
 }

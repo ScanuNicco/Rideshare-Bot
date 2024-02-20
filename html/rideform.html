@@ -106,29 +106,39 @@
         <script>
         var stateID;
         var type;
+        var urgent;
         window.onload = function() {
             stateID = getUrlVars()['state'];
             type = getUrlVars()['type'];
+            urgent = getUrlVars()['urgent'] == "true";
+
+            if(stateID != null && stateID.length > 0) { //If there's a state in the url parameter, log the user in with that.
+                localStorage.setItem('state', stateID);
+            } else { //Otherwise, use the state id stored in local storage
+                stateID = localStorage.getItem('state');
+            }
+
             if(type == "request") {
                 document.getElementById("formFrame").src = "request.html";
             } else if (type == "geodemo") {
                 document.getElementById("formFrame").src = "geodemo.html";
-            } else {
+            } else if (type == "offer") {
                 document.getElementById("formFrame").src = "offer.html";
+            } else {
+                document.getElementById("formFrame").src = "chooseType.html";
             }
             loadUserData();
         }
 
         async function loadUserData() {
-                    const result = await fetch('/api/getState', {
-                        method: 'POST',
-                        body: JSON.stringify({stateID: stateID}),
-                        headers: {"Content-type": "application/json"}
-                    });
-                    const json = await result.json();
+                    const json = await login(); //Make sure that whichever state we're trying to use exists
                     console.log(json);
-                    document.getElementById("profileDisplay").src = json.user.avatarURL;
-                    document.getElementById("nameText").innerText = json.user.globalName + " (@" + json.user.username + ")";
+                    if(json.stateValid){
+                        document.getElementById("profileDisplay").src = json.user.avatar;
+                        document.getElementById("nameText").innerText = json.user.displayName + " (@" + json.user.userName + ")";
+                    } else {
+                        alert("Authentication error. Please try generating a new link!");
+                    }
         }
         </script>
     </body>

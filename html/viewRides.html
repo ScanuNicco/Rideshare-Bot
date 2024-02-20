@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <title>My Rides | Rose Rideshares</title>
+        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="viewRides.css">
+        <link rel="icon" href="slowlane.png"></link>
+    </head>
+    <body>
+        <div class="headerBar">
+            <a href="/"><img src="slowlane_small.png"></a>
+            <input id="searchBar" placeholder="Search for a ride..." onkeypress="if (event.key == 'Enter') { searchNow(); }"></input>
+            <button onclick="searchNow()"><img src="search.svg"></button>
+            <div class="dropdown ddNoOpen" id="loginDD">
+                <div id='loginBox' class="ddLabel">
+                    <button class="smolGlowyButton" onclick="location.href = 'https://discord.com/api/oauth2/authorize?client_id=1054636089870123008&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2FoauthLanding.html&scope=identify+guilds'">Log In <img src="discord.svg" style="margin-left: 10px;"></button>
+                </div>
+                <div class="ddContent">
+                    <a href="/viewRides.html">My Rides</a>
+                    <a href="/rideform.html">New Ride</a>
+                    <a href="/logOut.html">Log Out</a>
+                </div>
+            </div>
+        </div>
+        <div id="sideBySide">
+            <div id="myRidesCont"><iframe id="loading" src="loading.svg"></iframe></div>
+            <iframe id="rideEdit" src="noneSelected.html"></iframe>
+        </div>
+        <script src="shared.js"></script>
+        <script>
+            var userInfo;
+            var rides;
+            var stateID;
+
+            async function getData() {
+                stateID = getUrlVars().state ?? localStorage.getItem('state'); //We need to log in ourselves, because this page needs to accept a state from a url parameter
+                const result = await fetch('/api/getLoginInfo', {
+                                method: 'POST',
+                                body: JSON.stringify({stateID: stateID}),
+                                headers: {"Content-type": "application/json"}
+                });
+                userInfo = await result.json();
+                if(userInfo.stateValid) {
+                    populateLoginBox(userInfo.user);
+                    const result = await fetch('/api/getRidesByUser', {
+                        method: 'POST',
+                        body: JSON.stringify({stateID: stateID}),
+                        headers: {"Content-type": "application/json"}
+                    });
+                    rides = await result.json();
+                    generateHTML();
+                    localStorage.setItem("state", stateID);
+                    if(getUrlVars().rideId != null) { //There is a rideID in the url parameter. Let's open it
+                        editRide(getUrlVars().rideId);
+                    }
+                } else {
+                    alert("Login Failed!");
+                }
+            }
+
+            function generateHTML() {
+                var html = ""
+                for(const ride of rides) {
+                    html += `<div class='viewerCard' onclick='editRide(${ride.id})'><span class='rideTitle'>${ride.originname} -> ${ride.destinname}</span><br><span class='rideTime'>${new Date(ride.departuretime).toLocaleString()}</span></div>`;
+                }
+                document.getElementById("myRidesCont").innerHTML = html;
+            }
+
+            function searchNow() {
+                location.href = "search.html?q=" + document.getElementById("searchBar").value;
+            }
+
+            var editFrame = document.getElementById("rideEdit");
+            function editRide(id) {
+                editFrame.src = `editRide.html?id=${id}&state=${localStorage.getItem('state')}`;
+            }
+
+            getData();
+        </script>
+    </body>
+</html>

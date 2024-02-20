@@ -8,16 +8,38 @@
     </head>
 <body>
 <img src="slowlane.png" id="logo">
+<div class="dropdown ddNoOpen floatingLogin" id="loginDD">
+    <div id='loginBox' class="ddLabel">
+        <button class="smolGlowyButton" onclick="location.href = 'https://discord.com/api/oauth2/authorize?client_id=1054636089870123008&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2FoauthLanding.html&scope=identify+guilds'">Log In <img src="discord.svg" style="margin-left: 10px;"></button>
+    </div>
+    <div class="ddContent">
+        <a href="/viewRides.html">My Rides</a>
+        <a href="/rideform.html">New Ride</a>
+        <a href="/logOut.html">Log Out</a>
+    </div>
+</div>
 <iframe id="bkg" src="ridesharebackground.svg"></iframe>
 <div id="fancyHeader">
 <h1>Where are you headed?</h1>
 <form action="search.html" method="get" id="mainSearch">
-<input placeholder="Indy, Chicago, Cleveland, St. Louis, Urbana, Cincinatti, Piedmont, Madison, .." id="searchBar" name="q"></input><button class="purpleButton">Search</button>
+<input placeholder="Search for a location, or click Browse Rides to view all" id="searchBar" name="q"></input><button class="purpleButton">Browse Rides</button>
 </form>
 </div>
 <h1>Want to Post Ride Offers or Ride Requests?</h1>
-<h3>Join the Rose-Rideshares Discord server!</h3>
+<a href="https://discord.com/api/oauth2/authorize?client_id=1054636089870123008&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2FoauthLanding.html&scope=identify+guilds">
+    <button class="dButton">Sign in with Discord!</button>
+</a>
+<h3>And Join the Rose-Rideshares Discord server!</h3>
 <iframe src="https://discord.com/widget?id=1027317839633326140&theme=dark" id="dWidget" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+<script src="shared.js"></script>
+<script>
+    window.onload = async function() {
+        var userInfo = await login();
+        if(userInfo.stateValid) {
+            populateLoginBox(userInfo.user);
+        }
+    }
+</script>
 <style>
 body {
     text-align: center;
@@ -44,7 +66,7 @@ body {
 #fancyHeader h1 {
     font-size: 82pt;
     margin: 0px;
-    padding: 42px;
+    padding: 60px 0px 30px 0px;
 }
 
 #fancyHeader input {

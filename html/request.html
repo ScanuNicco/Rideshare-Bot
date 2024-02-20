@@ -4,7 +4,7 @@
         <link rel="stylesheet" href="styles.css"></link>
     </head>
     <body>
-            <form id="rideform">
+            <form id="rideform" rr_submit_endpoint="/api/submitRideEvent">
       <div id="searchPane">
         <h1 id="searchTitle">Pick a Destination</h1>
         <input id="searchBox" placeholder="Search for a different location" oninput="populateSuggestions()"></input>
@@ -33,18 +33,22 @@
                 <div class="timeCont">
                   <input id="timeIn"  name="whenRaw" type="datetime-local" required></input>
                   <select id="timeZone" name="tz">
-                    <option value="Pacific/Honolulu">Hawaiian Time</option>
+                    <!--<option value="Pacific/Honolulu">Hawaiian Time</option>
                     <option value="America/Anchorage">Alaskan Time</option>
                     <option value="America/Los_Angeles">Pacific Time</option>
-                    <option value="America/Denver">Mountain Time</option>
+                    <option value="America/Denver">Mountain Time</option>-->
                     <option value="America/Chicago">Central Time</option>
-                    <option value="America/New_York">Eastern Time</option>
+                    <option value="America/New_York" selected>Eastern Time</option>
                   </select>
                 </div>
-                <ih>Payment</ih>
+                <ih>Options</ih>
                 <div class="checkCont">
-                <input type="checkbox" name="payment"></input>
-                <label for="payment">I am willing to cover my share of gas and/or parking.
+                  <input type="checkbox" name="payment"></input>
+                  <label for="payment">I am willing to cover my share of gas and/or parking.</label>
+                </div>
+                <div class="checkCont">
+                  <input type="checkbox" name="urgent"></input>
+                  <label for="urgent">Make this an urgent request.</label>
                 </div>
                 <ih>Additional Info</ih>
                 <textarea name="info"></textarea>
@@ -57,5 +61,15 @@
             }
             </style>
             <script src="forms.js"></script>
+            <script>
+              //Check the urgent checkbox if the user pressed the urgent request button on Discord
+              document.getElementsByName("urgent")[0].checked = parent.urgent;
+              //Populate some constants for the submit function
+              const isOffer = false;
+              //Populate suggestions and set the default "from" value
+              populateSuggestions().then(function() {
+                from = currentFeatures[0];
+              });
+            </script>
         </body>
     </html>
