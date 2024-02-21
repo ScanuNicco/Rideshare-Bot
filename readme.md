@@ -3,8 +3,11 @@ A bot to automate the Rose Rideshares Discord server
 
 ## Features
 * Server members can post Ride Offers and Ride Requests (RideEvents)
-* RideEvents can be easily managed through a simple control panel sent to their DMs
 * RideEvents will be summarized in Daily Updates posted to a dedicated channel.
+* Users can search RideEvents through Discord and a Web Interface
+* RideEvents can be managed through a simple control panel sent to their DMs
+    * Can generate a link to web interface for advanced editing
+* Checks if newly posted Ride Offers match any exiting Ride Requests
 
 ## Get Started
 ### Prerequisites
