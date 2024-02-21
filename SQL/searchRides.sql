@@ -77,7 +77,7 @@ begin
 		join discorduser as du on du.id = r.userid
 		left join rideoffer as ro on ro.eventid = r.id
 		left join riderequest as rr on rr.eventid = r.id
-		where dl.lname like '%' || $2 || '%';
+		where dl.lname like '%' || $2 || '%' and r.canceled is false;
 	elsif ($1 = 'o') then
 		return query
 		select 
@@ -113,7 +113,7 @@ begin
 		join discorduser as du on du.id = r.userid
 		left join rideoffer as ro on ro.eventid = r.id
 		left join riderequest as rr on rr.eventid = r.id
-		where ol.lname like '%' || $2 || '%';
+		where ol.lname like '%' || $2 || '%' and r.canceled is false;
 	end if;
 end;
 $function$

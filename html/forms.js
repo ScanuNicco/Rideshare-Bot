@@ -73,7 +73,11 @@ document.getElementById("rideform").onsubmit = async function(e) {
       document.getElementById("timeZone").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
       function trimFullName(feature) {
-        var output = feature.display_name.substring(feature.name.length + 2);
+        return trimLabel(feature.display_name);
+      }
+
+      function trimLabel(input) {
+        var output = input.substring(input.split(",")[0].length + 2);
         if(output.length > 50) {
           output = output.substring(0, 47) + "...";
         }

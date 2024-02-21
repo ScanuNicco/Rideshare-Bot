@@ -21,6 +21,6 @@ begin
 	join discorduser u on u.id = re.userid
 	left join rideoffer ro on ro.eventid = re.id
 	left join riderequest rr on rr.eventid = re.id
-	where ridetimestamp >= (NOW() - interval '24 Hours');
+	where ridetimestamp >= (NOW() - interval '24 Hours') and re.canceled is false;
 end;
 $$

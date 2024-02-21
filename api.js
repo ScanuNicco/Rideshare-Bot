@@ -80,7 +80,7 @@ const viewSingleRide = async function(args, res) {
         var dataToSend = {};
         var pgClient = pg.getNewClient();
         await pgClient.connect();
-        var ridesQuery = 'select * from viewRides($1)';
+        var ridesQuery = 'select * from getRideByID($1)';
         const ridesResponse = await pgClient.query(ridesQuery, [rideID]);
         dataToSend = ridesResponse.rows[0];
         res.end(JSON.stringify(dataToSend));    

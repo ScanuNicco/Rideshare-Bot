@@ -60,7 +60,7 @@
             function generateHTML() {
                 var html = ""
                 for(const ride of rides) {
-                    html += `<div class='viewerCard' onclick='editRide(${ride.id})'><span class='rideTitle'>${ride.originname} -> ${ride.destinname}</span><br><span class='rideTime'>${new Date(ride.departuretime).toLocaleString()}</span></div>`;
+                    html += `<div class='viewerCard' onclick='editRide(${ride.id})'><span class='rideTitle'>${ride.originname} -> ${ride.destinname}</span><br><span class='rideTime'>${new Date(ride.departuretime).toLocaleString()}${ride.canceled ? "<b>Canceled</b>" : ""}</span></div>`;
                 }
                 document.getElementById("myRidesCont").innerHTML = html;
             }

@@ -59,7 +59,10 @@
                 <label for="payment">I would like passengers to cover their share of gas and/or parking.</label>
                 </div>
                 
-                <button class="bigGlowyButton" >Save Changes</button>
+                <button class="bigGlowyButton" id="saveButton">Save Changes</button>
+                <div id="canceled">
+                    <h2>Cannot edit a canceled ride!</h2>
+                </div>
             </form>
             <script src="shared.js"></script>
             <script src="forms.js"></script>
@@ -78,19 +81,30 @@
                         });
                         editingRide = await result.json();
                         console.log(editingRide);
-                        document.getElementById("toName").innerText = editingRide["oname"];
-                        document.getElementById("fromName").innerText = editingRide["dname"];
-                        document.getElementById("editTitle").innerText = editingRide["isoffer"] ? "Edit Ride Offer" : "Edit Ride Request";
+                        document.getElementById("toName").innerText = editingRide["dlname"];
+                        document.getElementById("toFull").innerText = trimLabel(editingRide["dllabel"]);
+                        document.getElementById("fromName").innerText = editingRide["olname"];
+                        document.getElementById("fromFull").innerText = trimLabel(editingRide["ollabel"]);
+                        var editOrView = editingRide.deleted ? "Viewing" : "Editing";
+                        var offerOrRequest = editingRide["isoffer"] ? " Ride Offer" : " Ride Request";
+                        document.getElementById("editTitle").innerText = editOrView + offerOrRequest;
                         document.getElementById("addInfo").value = editingRide["info"] ?? "";
                         document.getElementById("cat").innerText = editingRide["cat"];
                         document.getElementById("status").value = editingRide["status"];
-                        document.getElementById("timeIn").value = dateToISOStringWithTZ(new Date(editingRide["deptime"]));
-                        document.getElementById("creation").innerText = new Date(editingRide["creattime"]).toLocaleString();
+                        document.getElementById("timeIn").value = dateToISOStringWithTZ(new Date(editingRide["when"]));
+                        document.getElementById("creation").innerText = new Date(editingRide["timestamp"]).toLocaleString();
                         isOffer = editingRide["isoffer"];
 
                         if(isOffer) {
                             document.getElementById("offerOnly").style.display = "block";
                             document.getElementById("veInfo").value = editingRide["veinfo"] ?? "";
+                        }
+
+                        if(editingRide.deleted) {
+                            var sb = document.getElementById("saveButton");
+                            sb.disabled = true;
+                            sb.style.display = "none";
+                            document.getElementById("canceled").style.display = "block";
                         }
                         
                         document.getElementsByName("payment").checked = editingRide["payment"];
@@ -146,6 +160,14 @@
                 width: 100%;
                 line-height: 1.5;
                 opacity: .5;
+            }
+
+            #canceled {
+                display: none;
+                background: #221626;
+                text-align: center;
+                border-radius: 5px;
+                box-shadow: inset 0px 0px 3px #0004;
             }
             </style>
             

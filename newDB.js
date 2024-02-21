@@ -65,7 +65,6 @@ async function deployDB() {
         "setStatus.sql",
         "validateState.sql",
         "viewAllRides.sql",
-        "viewRides.sql",
         "createIndicies.sql"
     ];
 

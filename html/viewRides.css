@@ -3,9 +3,9 @@ body {
 }
 
 #sideBySide {
-    margin-top: 68px;
+    margin-top: var(--nav-height);
     display: flex;
-    height: calc(100vh - 68px);
+    height: calc(100vh - var(--nav-height));
     overflow: hidden;
 }
 
@@ -41,4 +41,10 @@ body {
     font-weight: bold;
     font-size: 15pt;
     line-height: 1.5;
+}
+
+.rideTime b {
+    color: red;
+    font-weight: bolder;
+    margin-left: 5px;
 }
