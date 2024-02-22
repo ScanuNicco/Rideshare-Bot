@@ -29,6 +29,6 @@
                 }
 
                 function populateLoginBox(userInfo) {
-                        document.getElementById('loginBox').innerHTML = `<img class='dropDownInd' src='dropind.svg'><div style='margin: 0px 15px'><h3 class='loginDN'>${userInfo.displayName}</h3><span class='loginUN'>${userInfo.userName}</span></div><img class='loginPic' src='${userInfo.avatar}'>`;
+                        document.getElementById('loginBox').innerHTML = `<img class='dropDownInd' src='dropind.svg'><div id='loginDetails'><h3 class='loginDN'>${userInfo.displayName}</h3><span class='loginUN'>${userInfo.userName}</span></div><img class='loginPic' src='${userInfo.avatar}'>`;
                         document.getElementById('loginDD').classList.remove('ddNoOpen');
                 }

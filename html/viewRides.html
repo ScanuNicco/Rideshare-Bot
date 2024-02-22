@@ -4,10 +4,12 @@
         <link rel="stylesheet" href="styles.css">
         <link rel="stylesheet" href="viewRides.css">
         <link rel="icon" href="slowlane.png"></link>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+	    <meta name="description" content="Manage your rides">
     </head>
     <body>
         <div class="headerBar">
-            <a href="/"><img src="slowlane_small.png"></a>
+            <a href="/"><img id="logo" src="slowlane_small.png"></a>
             <input id="searchBar" placeholder="Search for a ride..." onkeypress="if (event.key == 'Enter') { searchNow(); }"></input>
             <button onclick="searchNow()"><img src="search.svg"></button>
             <div class="dropdown ddNoOpen" id="loginDD">
@@ -21,6 +23,7 @@
                 </div>
             </div>
         </div>
+        <button id="closeEditor" onclick="stopEditing()">&times;</button>
         <div id="sideBySide">
             <div id="myRidesCont"><iframe id="loading" src="loading.svg"></iframe></div>
             <iframe id="rideEdit" src="noneSelected.html"></iframe>
@@ -69,9 +72,17 @@
                 location.href = "search.html?q=" + document.getElementById("searchBar").value;
             }
 
-            var editFrame = document.getElementById("rideEdit");
             function editRide(id) {
-                editFrame.src = `editRide.html?id=${id}&state=${localStorage.getItem('state')}`;
+                rideEdit.src = `editRide.html?id=${id}&state=${localStorage.getItem('state')}`;
+                rideEdit.classList.add("mobileEdit");
+                myRidesCont.classList.add("mobileEdit");
+                closeEditor.classList.add("mobileEdit");
+            }
+
+            function stopEditing() {
+                rideEdit.classList.remove("mobileEdit");
+                myRidesCont.classList.remove("mobileEdit");
+                closeEditor.classList.remove("mobileEdit");
             }
 
             getData();
