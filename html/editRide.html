@@ -91,7 +91,8 @@
                         document.getElementById("addInfo").value = editingRide["info"] ?? "";
                         document.getElementById("cat").innerText = editingRide["cat"];
                         document.getElementById("status").value = editingRide["status"];
-                        document.getElementById("timeIn").value = dateToISOStringWithTZ(new Date(editingRide["when"]));
+                        var depart = new Date(editingRide["when"])
+                        document.getElementById("timeIn").valueAsNumber = depart - (depart.getTimezoneOffset() * 60 * 1000);
                         document.getElementById("creation").innerText = new Date(editingRide["timestamp"]).toLocaleString();
                         isOffer = editingRide["isoffer"];
 
@@ -113,10 +114,6 @@
                         //Populate the from and to variables in case the origin and destination aren't changed
                         from = {lon: editingRide.olong, lat: editingRide.olat, name: editingRide.oname, display_name: editingRide.olabel, type: editingRide.otype};
                         to = {lon: editingRide.dlong, lat: editingRide.dlat, name: editingRide.dname, display_name: editingRide.dlabel, type: editingRide.dtype};
-                }
-
-                function dateToISOStringWithTZ(date) {
-                    return `${date.getFullYear()}-${zeroOffset(date.getMonth())}-${zeroOffset(date.getDay())}T${zeroOffset(date.getHours())}:${zeroOffset(date.getMinutes())}`;
                 }
 
                 function zeroOffset(num){
