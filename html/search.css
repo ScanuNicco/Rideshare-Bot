@@ -73,7 +73,7 @@
                     margin: 0px;
                 }
 
-                .leftCol img {
+                .leftCol img, .leftCol object {
                     border-radius: 5px;
                 }
 

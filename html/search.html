@@ -197,9 +197,9 @@
                     var date = new Date(re.when).toLocaleString();
                     re.dateObj = date;
                     if(type == "offer"){
-                        tilesHTML += `<div class='rideCard' onclick="showOffer(${ind})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${trimToLength(re.dest.properties.geocoding.name)}</h2><span><b>From:</b> ${re.whence.properties.geocoding.name ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
+                        tilesHTML += `<div class='rideCard' onclick="showOffer(${ind})"><div class='leftCol'><img src=${re.target.avatarURL} onerror='noPic(this)'><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${trimToLength(re.dest.properties.geocoding.name)}</h2><span><b>From:</b> ${re.whence.properties.geocoding.name ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
                     } else {
-                        tilesHTML += `<div class='rideCard' onclick="showRequest(${ind})"><div class='leftCol'><img src=${re.target.avatarURL ?? "noPic.svg"}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.dest.properties.geocoding.name)}</h2><span><b>From:</b> ${re.whence.properties.geocoding.name ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;   
+                        tilesHTML += `<div class='rideCard' onclick="showRequest(${ind})"><div class='leftCol'><img src=${re.target.avatarURL} onerror='noPic(this)'><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.dest.properties.geocoding.name)}</h2><span><b>From:</b> ${re.whence.properties.geocoding.name ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;   
                     }
                 }
 
@@ -404,6 +404,10 @@
                     mapToggle.children[0].classList.remove("map-tab-active");
                     pinsAtDest = true;
                     populateCurrentView();
+                }
+
+                function noPic(elem) {
+                    elem.src = 'noPic.svg';
                 }
             </script>
         </body>
