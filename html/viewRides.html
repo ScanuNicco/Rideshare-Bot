@@ -50,6 +50,10 @@
                         headers: {"Content-type": "application/json"}
                     });
                     rides = await result.json();
+                    if(rides.error != null) {
+                        alert(rides.error);
+                        return;
+                    }
                     generateHTML();
                     localStorage.setItem("state", stateID);
                     if(getUrlVars().rideId != null) { //There is a rideID in the url parameter. Let's open it

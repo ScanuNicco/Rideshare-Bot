@@ -16,10 +16,10 @@ create or replace function getRidesByUser (discordidarg bigint) --get a list of 
 $$
 declare
 begin
-	return query select re.id, cat as category, ridetime as departureTime, ridestatus as status, ridetimestamp as createdTime, ridepayment as payment, rideinfo as info, origin.lname as originname, dest.lname as destinname, re.canceled
+	return query select re.id, cat as category, departureTime, ridestatus as status, createdTime, ridepayment as payment, rideinfo as info, origin.lname as originname, dest.lname as destinname, re.canceled
 	from rideevent re join ridelocation dest on re.destinlocation = dest.id
 	join ridelocation origin on re.originlocation = origin.id
 	where re.userid = getuserid(discordidarg)
-	order by ridetimestamp desc;
+	order by createdTime desc;
 end;
 $$

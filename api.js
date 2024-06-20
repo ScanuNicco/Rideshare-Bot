@@ -139,6 +139,7 @@ const userInServer = async function(dcClient, args, res) {
     params.append('redirect_uri', "http://localhost:8081/oauthLanding.html");
     params.append('scope', 'identify');
 
+    //First, we convert the OAUTH code to a token that can be used in future API calls
     var response = await fetch("https://discord.com/api/oauth2/token", {
         method: 'POST',
         body: params,
@@ -148,29 +149,44 @@ const userInServer = async function(dcClient, args, res) {
     });
     const token = await response.json();
 
+    //We then get the user's information
     response = await fetch('https://discord.com/api/users/@me', {
 		method: "GET",
         headers: {
             Authorization: `${token["token_type"]} ${token["access_token"]}`
 		}
 	});
-    const user = await response.json();
+    const user = await response.json(); //Limited user info retured by querying the API with the user's token
     console.log(user);
 
     const uid = user["id"];
     console.log(uid);
 
-    const moreData = await dcClient.users.fetch(uid);
-    console.log(moreData);
+    const guild = await dcClient.guilds.fetch(process.env.GUILD_ID);
+    try{
+        const guildUserData = await guild.members.fetch(uid);
+        console.log(guildUserData);
+    } catch (e) {
+        if(e.rawError.code == 10007) {
+            Logger.logDebug(`Regufusing to authenticate ${user.tag} because they are not a member of the guild.`);
+            res.end(JSON.stringify({error: 1}));
+        } else {
+            res.writeHead(500);
+            Logger.logError(e);
+            res.end(JSON.stringify({error: 2}));
+        }
+    }
+
+    const userInfo = await dcClient.users.fetch(uid); //Full user info returned by querying the API as Rideshare Bot
 
     var pgClient = pg.getNewClient();
     await pgClient.connect();
 
-    var validateQuery = `CALL upsertuser(${uid}, '${user["global_name"]}', '${user["username"]}', '${moreData.avatarURL()}')`;
-    const voidResponse = await pgClient.query(validateQuery);
+    var validateQuery = "CALL upsertuser($1, $2, $3, $4)";
+    const voidResponse = await pgClient.query(validateQuery, [uid, user["global_name"], user["username"], userInfo.avatarURL()]);
 
-    var validateQuery = `SELECT createState(${uid})`;
-    const pgResponse = await pgClient.query(validateQuery);
+    var createQuery = "SELECT createState($1)";
+    const pgResponse = await pgClient.query(createQuery, [uid]);
     var valid = pgResponse.rows[0];
     
     res.end(JSON.stringify(valid));
@@ -178,25 +194,25 @@ const userInServer = async function(dcClient, args, res) {
 };
 
 const search = async function(args, res) {
-    const query = args['Query'];
-    const type = args['Type'];
+    const query = args.query;
+    const type = args.type;
 
     var pgClient = pg.getNewClient();
     await pgClient.connect();
 
-    var validateQuery = `SELECT * FROM searchrides('d', '${query}')`; //Searching destinations is hardcoded currently, switch d to o to search locations
-    const pgResponse = await pgClient.query(validateQuery);
+    var validateQuery = `SELECT * FROM searchrides('d', $1)`; //Searching destinations is hardcoded currently, switch d to o to search locations
+    const pgResponse = await pgClient.query(validateQuery, [query]);
     //console.log(pgResponse.rows[0]);
 
     // res.end the response table in correct format
     var offers = [];
     var requests = [];
-    for (ride in pgResponse.rows) {
+    for (var ride in pgResponse.rows) {
         var row = pgResponse.rows[ride];
         console.log(row);
         if (row.vehicleinfo) {
             offers.push({
-                "timestamp": new Date(row.ridetimestamp).getTime(),
+                "timestamp": new Date(row.createdtime).getTime(),
                 "target": {"username": row.username, "avatarURL": row.avatarurl, "globalName": row.displayname},
                 "dest": {
                     "properties": {"geocoding": {"type": row.dltype, "label": row.dllabel, "name": row.dlname}},
@@ -204,7 +220,7 @@ const search = async function(args, res) {
                 "whence": {
                     "properties": {"geocoding": {"type": row.oltype, "label": row.ollabel, "name": row.olname}},
                     coordinates: {lat: row.olat, long: row.olong}},
-                "when": new Date(row.ridetime).getTime(),
+                "when": new Date(row.departuretime).getTime(),
                 "payment": row.ridepayment,
                 "info": row.rideinfo,
                 "status": row.ridestatus,
@@ -213,7 +229,7 @@ const search = async function(args, res) {
                 "message": {"channelId": `"${row.dchannelid}"`, "guildId": `"${row.dguildid}"`, "id": `"${row.dmessageid}"`}});
         } else {
             requests.push({
-                "timestamp": new Date(row.ridetimestamp).getTime(),
+                "timestamp": new Date(row.createdtime).getTime(),
                 "target": {"username": row.username, "avatarURL": row.avatarurl, "globalName": row.displayname},
                 "dest": {
                     "properties": {"geocoding": {"type": row.dltype, "label": row.dllabel, "name": row.dlname}},
@@ -221,7 +237,7 @@ const search = async function(args, res) {
                 "whence": {
                     "properties": {"geocoding": {"type": row.oltype, "label": row.ollabel, "name": row.olname}},
                     coordinates: {lat: row.olat, long: row.olong}},
-                "when": new Date(row.ridetime).getTime(),
+                "when": new Date(row.departuretime).getTime(),
                 "payment": row.ridepayment,
                 "info": row.rideinfo,
                 "status": row.ridestatus,
@@ -291,9 +307,9 @@ const submitRideEvent = async function(dcClient, args, res) {
 	Logger.logDebug(re);
 
     //Send the ride message
-	var messageResult = await re.sendRideMessage(dcClient, curCatID)
+	var messageResult = await re.sendRideMessage(dcClient, curCatID);
 	if(re.message == null) {
-		Logger.logError("Error while processing ")
+		Logger.logError("Error while processing ");
 		Logger.logError("Message did not send for some reason!");
 	}
     Logger.logDebug(messageResult);
@@ -323,7 +339,7 @@ const submitRideEvent = async function(dcClient, args, res) {
     var updateQuery = `SELECT * FROM getAllRides()`;
 	const response = await pgClient.query(updateQuery);
     var allRequests =  response.rows;
-    Logger.logDebug(`Searching through ${allRequests.length} requests to see if any match...`)
+    Logger.logDebug(`Searching through ${allRequests.length} requests to see if any match...`);
 
     //Loop through to see if any match
     var resultText = "";

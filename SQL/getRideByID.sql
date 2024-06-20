@@ -49,9 +49,9 @@ begin
 		return query
 		select 
 			r.cat as cat,
-			r.ridetime as "when",
+			r.departureTime as "when",
 			r.ridestatus as status,
-			r.ridetimestamp as "timestamp", 
+			r.createdTime as "timestamp", 
 			r.ridepayment as payment,
 			r.rideinfo as info,
 			dm.dmessageid as dmessageid,

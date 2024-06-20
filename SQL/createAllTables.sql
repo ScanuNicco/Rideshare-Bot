@@ -37,9 +37,9 @@ create table RideLocation (
 create table RideEvent(
 	ID					serial primary key,
 	cat					varchar(200),
-	rideTime			timestamp, --departure time
+	departureTime		timestamp, --departure time
 	rideStatus			varchar(40),
-	rideTimestamp		timestamp,
+	createdTime		    timestamp,
 	ridePayment			bool,
 	rideInfo			varchar(200),
 	MessageID			int,

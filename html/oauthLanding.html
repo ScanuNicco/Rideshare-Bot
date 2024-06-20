@@ -11,15 +11,26 @@
 <script src="shared.js"></script>
 <iframe id="loading" src="loading.svg"></iframe>
 <h1 id="mainText" class="center" style="display: none;">Loading...</h1>
-<div id="flex">
-<a id="serverLink" href="https://discord.gg/UjXkkdCzDZ">
-    <button class="dButton">Join the Discord Server here!</button>
-</a>
+<div id="errorActions">
+    <a id="serverLink" href="https://discord.gg/UjXkkdCzDZ">
+        <button class="smolGlowyButton">Join Rose Rideshares!</button>
+    </a>
+    <a href="/">
+        <button class="smolGlowyButton">Go Back</button>
+    </a>
 </div>
 
 <script>
 	window.onload = async function() {
         const params = new URLSearchParams(document.location.search);
+
+        if(params.get("error") != null) {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("mainText").style.display = "block";
+            document.getElementById("mainText").innerHTML = "Login Was Unsuccessful!";
+            document.getElementById("errorActions").style.display = "block";
+            return;
+        }
 
         const data = await userInServer(params.get("code"));
         console.log(data);
@@ -27,13 +38,47 @@
 		if (data["createstate"]) {
             localStorage.setItem('state', data["createstate"]);
             window.location.href = "/viewRides.html";
-        } else {
-            document.getElementById("mainText").style.display = "unset";
-            document.getElementById("mainText").innerHTML = "You need to join the Rose Rideshares Discord Server:";
-            document.getElementById("serverLink").visability = "visable";
+        } else if(data["error"] == 1) {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("mainText").style.display = "block";
+            document.getElementById("mainText").innerHTML = "You need to join the Rose Rideshares Discord Server!";
+            document.getElementById("serverLink").style.display = "unset";
+            document.getElementById("errorActions").style.display = "block";
+        } else if(data["error"] == 2) {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("mainText").style.display = "block";
+            document.getElementById("mainText").innerHTML = "Unknown Error";
+            document.getElementById("errorActions").style.display = "block";
         }
 	};
 </script>
+
+<style>
+    body {
+        text-align: center;
+    }
+
+    #errorActions {
+        display: none;
+    }
+
+    #serverLink {
+        display: none;
+    }
+
+    #errorActions button {
+        margin: 15px;
+    }
+
+    #errorActions a {
+        text-decoration: none;
+    }
+
+    #mainText {
+        margin-top: 40vh;
+    }
+
+</style>
 
 </body>
 </head>

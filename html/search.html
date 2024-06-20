@@ -164,7 +164,7 @@
                 async function search(q) {
                     const result = await fetch('/api/query', {
                         method: 'POST',
-                        body: JSON.stringify({Query: q}),
+                        body: JSON.stringify({query: q}),
                         headers: {"Content-type": "application/json"}
                     });
                     const json = await result.json();

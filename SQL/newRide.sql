@@ -13,9 +13,9 @@
 
 create or replace procedure newRide (
 	cat varchar(200),
-	ridetime timestamp,
+	departureTime timestamp,
 	ridestatus varchar(200),
-	ridetimestamp timestamp,
+	createdTime timestamp,
 	ridepayment bool,
 	rideinfo varchar(200),
 	
@@ -58,9 +58,9 @@ begin
 
 -- Ensures No Null Arguements
 if (cat is null or
-	ridetime is null or
+	departureTime is null or
 	ridestatus is null or
-	ridetimestamp is null or
+	createdTime is null or
 	ridepayment is null or
 	rideinfo is null or
 	dmessageid is null or
@@ -112,8 +112,8 @@ call upsertuser(discordidarg, displaynamearg, usernamearg, avatarurlarg);
 select getuserid(discordidarg) into userid;
 
 -- Creates a rideevent
-insert into rideevent (cat, ridetime, ridestatus, ridetimestamp, ridepayment, rideinfo, messageid, originlocation, destinlocation, userid)
-values (cat, ridetime, ridestatus, ridetimestamp, ridepayment, rideinfo, messageid, originlocation, destinlocation, userid) returning id into rideid;
+insert into rideevent (cat, departureTime, ridestatus, createdTime, ridepayment, rideinfo, messageid, originlocation, destinlocation, userid, canceled)
+values (cat, departureTime, ridestatus, createdTime, ridepayment, rideinfo, messageid, originlocation, destinlocation, userid, false) returning id into rideid;
 
 -- Determine Ride Type
 if (offerorrequest is true)

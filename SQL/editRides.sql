@@ -55,7 +55,7 @@ BEGIN
 	end if;
 	
 	update rideevent
-	set rideInfo = info, ridetime = depTime, ridestatus = status, originlocation = findlocation(oname, olabel, otype, olat, olong), destinlocation = findlocation(dname, dlabel, dtype, dlat, dlong)
+	set rideInfo = info, departureTime = depTime, ridestatus = status, originlocation = findlocation(oname, olabel, otype, olat, olong), destinlocation = findlocation(dname, dlabel, dtype, dlat, dlong)
 	where ID = rideID;
 	
 	if veInfo is not null then

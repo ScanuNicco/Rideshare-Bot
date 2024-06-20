@@ -17,7 +17,7 @@
                         return json;
                 }
 
-                async function userInServer(authcode) {
+                async function userInServer(authcode) { //Checks whether the user is a member of the Rose Rideshares Discord Server
                         const result = await fetch('/api/userInServer', {
                                 method: 'POST',
                                 body: JSON.stringify({code: authcode}),
@@ -28,7 +28,7 @@
                         return json;
                 }
 
-                function populateLoginBox(userInfo) {
+                function populateLoginBox(userInfo) { //Populates the login box with a user's info
                         document.getElementById('loginBox').innerHTML = `<img class='dropDownInd' src='dropind.svg'><div id='loginDetails'><h3 class='loginDN'>${userInfo.displayName}</h3><span class='loginUN'>${userInfo.userName}</span></div><img class='loginPic' src='${userInfo.avatar}'>`;
                         document.getElementById('loginDD').classList.remove('ddNoOpen');
                 }

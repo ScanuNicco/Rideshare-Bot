@@ -14,9 +14,9 @@
 create or replace function searchrides (locationtype char(1), locationname varchar(200))
 returns table (
 	cat varchar(200),
-	ridetime timestamp,
+	departureTime timestamp,
 	ridestatus varchar(200),
-	ridetimestamp timestamp, 
+	createdTime timestamp, 
 	ridepayment bool,
 	rideinfo varchar(200),
 	dmessageid bigint,
@@ -46,9 +46,9 @@ begin
 		return query
 		select 
 			r.cat as cat,
-			r.ridetime as ridetime,
+			r.departureTime as departureTime,
 			r.ridestatus as ridestatus,
-			r.ridetimestamp as ridetimestamp, 
+			r.createdTime as ridetimestamp, 
 			r.ridepayment as ridepayment,
 			r.rideinfo as rideinfo,
 			dm.dmessageid as dmessageid,
@@ -82,9 +82,9 @@ begin
 		return query
 		select 
 			r.cat as cat,
-			r.ridetime as ridetime,
+			r.departureTime as departureTime,
 			r.ridestatus as ridestatus,
-			r.ridetimestamp as ridetimestamp, 
+			r.createdTime as ridetimestamp, 
 			r.ridepayment as ridepayment,
 			r.rideinfo as rideinfo,
 			dm.dmessageid as dmessageid,
