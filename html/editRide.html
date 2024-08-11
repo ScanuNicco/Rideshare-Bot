@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <link rel="stylesheet" href="styles.css"></link>
+    </head>
+    <body>
+            <form id="rideform"  rr_submit_endpoint="/api/editRides">
+                <div id="searchPane">
+                    <h1 id="searchTitle">Pick a Destination</h1>
+                    <input id="searchBox" placeholder="Search for a different location" oninput="populateSuggestions()"></input>
+                    <div id="suggestions"></div>
+                  </div>
+      <div id="formPane">
+                <h1 class = "center" id="editTitle">Edit a request</h1>
+                <ih>Category</ih>
+                <p id="cat" class="noEdit"></p>
+                <ih>Going To</ih>
+                <div class="result" onclick="chooseTo()">
+                    <h2 id="toName"></h2>
+                    <span id="toFull"></span>
+                    <div class="changeCont">
+                      <span>Click to Change Location</span>
+                    </div>
+                  </div>
+                  <ih>Leaving From</ih>
+                  <div class="result" onclick="chooseFrom()">
+                    <h2 id="fromName"></h2>
+                    <span id="fromFull"></span>
+                    <div class="changeCont">
+                      <span>Click to Change Location</span>
+                    </div>
+                  </div>
+                <ih>Departure Time</ih>
+                <div id = "departTime" class="timeCont">
+                    <input id="timeIn"  name="whenRaw" type="datetime-local"></input>
+                    <select id="timeZone" name="tz">
+                      <!--<option value="Pacific/Honolulu">Hawaiian Time</option>
+                      <option value="America/Anchorage">Alaskan Time</option>
+                      <option value="America/Los_Angeles">Pacific Time</option>
+                      <option value="America/Denver">Mountain Time</option>-->
+                      <option value="America/Chicago">Central Time</option>
+                      <option value="America/New_York" selected>Eastern Time</option>
+                    </select>
+                </div>
+
+                <ih>Creation Time</ih>
+                <p id="creation" class="noEdit"></p>
+                <ih>Status</ih>
+                <input id="status" name="status" size="200" placeholder='e.g "3 seats left", "Still need a ride"'></input>
+                <ih>Additional Info</ih>
+                <textarea id = "addInfo" name="info" size="1000"></textarea>
+                <div id="offerOnly">
+                    <ih>Vehicle Info</ih>
+                    <input id="veInfo" name="vehicleInfo" size="200"></input>
+                </div>
+                <div class="checkCont">
+                <input type="checkbox" name="payment"></input>
+                <label for="payment" id="payLabel">I am offering to pay for a portion of gas/parking expenses.</label>
+                </div>
+                
+                <button class="bigGlowyButton" id="saveButton">Save Changes</button>
+                <div id="canceled">
+                    <h2>Cannot edit a canceled ride!</h2>
+                </div>
+            </form>
+            <script src="shared.js"></script>
+            <script src="forms.js"></script>
+            <script>
+                rideID = getUrlVars()["id"]; //see forms.js for declaration
+                var editingRide;
+                //Populate some constants for the submit function
+                var isOffer;
+                const stateID = getUrlVars()["state"];
+
+                async function getData() {
+                        const result = await fetch('/api/viewSingleRide', {
+                            method: 'POST',
+                            body: JSON.stringify({rideID: rideID}),
+                            headers: {"Content-type": "application/json"}
+                        });
+                        editingRide = await result.json();
+                        console.log(editingRide);
+                        document.getElementById("toName").innerText = editingRide["dlname"];
+                        document.getElementById("toFull").innerText = trimLabel(editingRide["dllabel"]);
+                        document.getElementById("fromName").innerText = editingRide["olname"];
+                        document.getElementById("fromFull").innerText = trimLabel(editingRide["ollabel"]);
+                        var editOrView = editingRide.deleted ? "Viewing" : "Editing";
+                        var offerOrRequest = editingRide["isoffer"] ? " Ride Offer" : " Ride Request";
+                        document.getElementById("editTitle").innerText = editOrView + offerOrRequest;
+                        document.getElementById("addInfo").value = editingRide["info"] ?? "";
+                        document.getElementById("cat").innerText = editingRide["cat"];
+                        document.getElementById("status").value = editingRide["status"];
+                        var depart = new Date(editingRide["when"])
+                        document.getElementById("timeIn").valueAsNumber = depart - (depart.getTimezoneOffset() * 60 * 1000);
+                        document.getElementById("creation").innerText = new Date(editingRide["timestamp"]).toLocaleString();
+                        isOffer = editingRide["isoffer"];
+
+                        if(isOffer) {
+                            document.getElementById("offerOnly").style.display = "block";
+                            document.getElementById("veInfo").value = editingRide["vehicleinfo"] ?? "";
+                            payLabel.innerText = "I would like passengers to cover their share of gas and/or parking.";
+                        }
+
+                        if(editingRide.deleted) {
+                            var sb = document.getElementById("saveButton");
+                            sb.disabled = true;
+                            sb.style.display = "none";
+                            document.getElementById("canceled").style.display = "block";
+                        }
+                        
+                        document.getElementsByName("payment")[0].checked = editingRide["payment"];
+                        console.log("got data");
+
+                        //Populate the from and to variables in case the origin and destination aren't changed
+                        from = {lon: editingRide.olong, lat: editingRide.olat, name: editingRide.olname, display_name: editingRide.ollabel, type: editingRide.oltype};
+                        to = {lon: editingRide.dlong, lat: editingRide.dlat, name: editingRide.dlname, display_name: editingRide.dllabel, type: editingRide.dltype};
+                }
+
+                function zeroOffset(num){
+                    return num < 10 ? "0" + num : num;
+                }
+
+                //Populate suggestions
+                populateSuggestions();
+                getData();
+                
+            </script>
+
+            <style>
+            body {
+                background: transparent;
+                overflow-x: hidden;
+            }
+
+            #offerOnly {
+                display: none;
+            }
+
+            #searchPane {
+                left: -105vw;
+            }
+
+            #formPane {
+                left: 0vw;
+            }
+
+            .noEdit {
+                cursor: not-allowed;
+                border-radius: 3px;
+                color: #eee;
+                background: #222;
+                padding: 5px;
+                font-size: 14pt;
+                box-shadow: inset 0px 0px 5px rgba(0, 0, 0, .3);
+                border: none;
+                min-width: 400px;
+                width: 100%;
+                line-height: 1.5;
+                opacity: .5;
+            }
+
+            #canceled {
+                display: none;
+                background: #221626;
+                text-align: center;
+                border-radius: 5px;
+                box-shadow: inset 0px 0px 3px #0004;
+            }
+            </style>
+            
+    </body>
+</html>

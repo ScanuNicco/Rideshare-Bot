@@ -11,7 +11,19 @@
     </head>
     <body>
         <div class="headerBar">
-            <a href="/"><img src="slowlane_small.png"></a><input id="searchBar" placeholder="Search for a ride..." onkeypress="if (event.key == 'Enter') { searchNow(); }"></input><button onclick="searchNow()"><img src="search.svg"></button><button class="smolGlowyButton" onclick="location.href = 'https://discord.gg/nSraC7nYMm'"><img src="discord.svg"></button>
+            <a href="/"><img id="logo" src="slowlane_small.png"></a>
+            <input id="searchBar" placeholder="Search for a ride..." onkeypress="if (event.key == 'Enter') { searchNow(); }"></input>
+            <button onclick="searchNow()"><img src="search.svg"></button>
+            <div class="dropdown ddNoOpen" id="loginDD">
+                <div id='loginBox' class="ddLabel">
+                    <button class="smolGlowyButton" onclick="location.href = 'https://discord.com/api/oauth2/authorize?client_id=1054636089870123008&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2FoauthLanding.html&scope=identify+guilds'">Log In <img src="discord.svg" style="margin-left: 10px;"></button>
+                </div>
+                <div class="ddContent">
+                    <a href="/viewRides.html">My Rides</a>
+                    <a href="/rideform.html">New Ride</a>
+                    <a href="/logOut.html">Log Out</a>
+                </div>
+            </div>
         </div>
         <iframe id="loading" src="loading.svg"></iframe>
         <div id="outerFilterCont">
@@ -75,6 +87,9 @@
                 <a id="goToMessage">
                     <button class="bigGlowyButton">View On Discord</button>
                 </a>
+                <a id="sameDestination">
+                    <button class="bigGlowyButton">Find All Rides to the Same Destination</button>
+                </a>
             </div>
         </div>
         <script src="/fullcalendar/dist/index.global.min.js"></script>
@@ -91,9 +106,10 @@
                 var map;
                 var mlg;
                 var oms;
+                var userInfo;
 
                 window.onload = async function() {
-                    q = getUrlVars()['q'];
+                    q = decodeURI(getUrlVars()['q']);
                     document.getElementById('searchBar').value = q;
                     //Intialize calendar
                     calendarEl = document.getElementById('calendarCont');
@@ -128,6 +144,11 @@
                     oms = new OverlappingMarkerSpiderfier(map);
                     oms.addListener('click', showRideFromMarker);
 
+                    userInfo = await login();
+                    if(userInfo.stateValid) {
+                        populateLoginBox(userInfo.user);
+                    }
+
                     resetFilter();
                 }
 
@@ -143,7 +164,7 @@
                 async function search(q) {
                     const result = await fetch('/api/query', {
                         method: 'POST',
-                        body: JSON.stringify({Query: q}),
+                        body: JSON.stringify({query: q}),
                         headers: {"Content-type": "application/json"}
                     });
                     const json = await result.json();
@@ -165,6 +186,9 @@
                 function showTiles() {
                     tilesHTML = "";
                     displayRides(generateHTML);
+                    if(tilesHTML == ""){ //There were no rides
+                            tilesHTML = "<div id='lhCont'><img src='noRides.svg' class='lighthouse'></img></div>";
+                    }
                     document.getElementById("tilesCont").innerHTML = tilesHTML;
                     document.getElementById("loading").style.display = 'none';
                 }
@@ -173,9 +197,9 @@
                     var date = new Date(re.when).toLocaleString();
                     re.dateObj = date;
                     if(type == "offer"){
-                        tilesHTML += `<div class='rideCard' onclick="showOffer(${ind})"><div class='leftCol'><img src=${re.target.avatarURL}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${trimToLength(re.destName)}</h2><span><b>From:</b> ${re.whenceName ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
+                        tilesHTML += `<div class='rideCard' onclick="showOffer(${ind})"><div class='leftCol'><img src=${re.target.avatarURL} onerror='noPic(this)'><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Offer to ${trimToLength(re.dest.properties.geocoding.name)}</h2><span><b>From:</b> ${re.whence.properties.geocoding.name ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span><span><b>Vehicle:</b> ${re.vehicleInfo}</span></div></div>`;
                     } else {
-                        tilesHTML += `<div class='rideCard' onclick="showRequest(${ind})"><div class='leftCol'><img src=${re.target.avatarURL ?? "noPic.svg"}><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.destName)}</h2><span><b>From:</b> ${re.whenceName ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;   
+                        tilesHTML += `<div class='rideCard' onclick="showRequest(${ind})"><div class='leftCol'><img src=${re.target.avatarURL} onerror='noPic(this)'><h4>${re.target.username}</h4></div><div class='rightCol'><h2>Ride Request for ${trimToLength(re.dest.properties.geocoding.name)}</h2><span><b>From:</b> ${re.whence.properties.geocoding.name ?? 'Rose-Hulman'}</span><span><b>When:</b> ${date}</span></div></div>`;   
                     }
                 }
 
@@ -230,7 +254,7 @@
                     }
                     document.getElementById("payment").innerText = offer.payment ? offer.target.username + " is excpecting payment to help cover gas/parking" : "Not requested.";
                     document.getElementById("vehicle").innerText = offer.vehicleInfo;
-                    document.getElementById("rideModalHeader").innerText = "Ride Offer to " + offer.destName;
+                    document.getElementById("rideModalHeader").innerText = "Ride Offer to " + offer.dest.properties.geocoding.name;
                     openModal();
                 }
 
@@ -241,7 +265,7 @@
                     for(var i = 0; i < document.getElementsByClassName("offerOnly").length; i++){
                         document.getElementsByClassName("offerOnly")[i].style.display = "none";
                     }
-                    document.getElementById("rideModalHeader").innerText = "Ride Request for " + request.destName;
+                    document.getElementById("rideModalHeader").innerText = "Ride Request for " + request.dest.properties.geocoding.name;
                     openModal();
                 }
 
@@ -254,6 +278,7 @@
                     document.getElementById("when").innerText = re.dateObj.toLocaleString();
                     document.getElementById("info").innerText = re.info ?? "None";
                     document.getElementById("goToMessage").href = `https://discord.com/channels/${re.message.guildId}/${re.message.channelId}/${re.message.id}`;
+                    document.getElementById("sameDestination").href = `/search.html?q=${re.dest.properties.geocoding.name}`; 
                     document.getElementById("statusContent").innerText = re.status ?? "No status";
                 }
 
@@ -307,9 +332,9 @@
                 function mapGenerator(type, ind, re) {
                     var coords;
                     if(pinsAtDest){
-                        coords = [re.dest.geometry.coordinates[1], re.dest.geometry.coordinates[0]];
+                        coords = [re.dest.coordinates.lat, re.dest.coordinates.long];
                     } else {
-                        coords = [re.whence.geometry.coordinates[1], re.whence.geometry.coordinates[0]];
+                        coords = [re.whence.coordinates.lat, re.whence.coordinates.long];
                     }
                     var marker = L.marker(coords).addTo(mlg);
                     marker.rideType = type;
@@ -327,7 +352,7 @@
 
                 function calGenerator(type, ind, re){
                     calendar.addEvent({
-                        title: re.destName,
+                        title: re.dest.properties.geocoding.name,
                         start: re.when,
                         extendedProps: {type: type, index: ind},
                         color: type == "offer" ? "rgb(137, 220, 137)" : "rgb(87, 189, 220)"
@@ -379,6 +404,10 @@
                     mapToggle.children[0].classList.remove("map-tab-active");
                     pinsAtDest = true;
                     populateCurrentView();
+                }
+
+                function noPic(elem) {
+                    elem.src = 'noPic.svg';
                 }
             </script>
         </body>

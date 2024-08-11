@@ -1,64 +1,72 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" href="styles.css"></link>
-    </head>
-    <body>
-            <form id="rideform">
+<DOCTYPE html>
+<tml>
+  <head>
+      <link rel="stylesheet" href="styles.css"></link>
+  </head>
+  <body>
+    <form id="rideform" rr_submit_endpoint="/api/submitRideEvent">
       <div id="searchPane">
         <h1 id="searchTitle">Pick a Destination</h1>
         <input id="searchBox" placeholder="Search for a different location" oninput="populateSuggestions()"></input>
         <div id="suggestions"></div>
       </div>
       <div id="formPane">
-                <h1>Offer a Ride</h1>
-                <p class="requiredInd">(*) Required</p>
-                <ih>Going To <r>*</r></ih>
-                <div class="result" onclick="chooseTo()">
-                  <h2 id="toName"></h2>
-                  <span id="toFull"></span>
-                  <div class="changeCont">
-                    <span>Click to Change Location</span>
-                  </div>
-                </div>
-                <ih>Leaving From</ih>
-                <div class="result" onclick="chooseFrom()">
-                  <h2 id="fromName"></h2>
-                  <span id="fromFull"></span>
-                  <div class="changeCont">
-                    <span>Click to Change Location</span>
-                  </div>
-                </div>
-                <ih>When <r>*</r></ih>
-                <div class="timeCont">
-                  <input id="timeIn" name="whenRaw" type="datetime-local" required></input>
-                  <select id="timeZone" name="tz">
-                    <option value="Pacific/Honolulu">Hawaiian Time</option>
-                    <option value="America/Anchorage">Alaskan Time</option>
-                    <option value="America/Los_Angeles">Pacific Time</option>
-                    <option value="America/Denver">Mountain Time</option>
-                    <option value="America/Chicago">Central Time</option>
-                    <option value="America/New_York">Eastern Time</option>
-                  </select>
-                </div>
-                <ih>Vehicle Description <r>*</r></ih>
-                <input name="vehicleInfo" required></input>
-                <ih>Payment</ih>
-                <div class="checkCont">
-                <input type="checkbox" name="payment"></input>
-                <label for="payment">I would like passengers to cover their share of gas and/or parking.
-                </div>
-                <ih>Additional Info</ih>
-                <textarea name="info"></textarea>
-                <button class="bigGlowyButton">Create Offer!</button>
+        <h1>Offer a Ride</h1>
+        <p class="requiredInd">(*) Required</p>
+        <ih>Going To <r>*</r></ih>
+        <div class="result" onclick="chooseTo()">
+          <h2 id="toName"></h2>
+          <span id="toFull"></span>
+          <div class="changeCont">
+            <span>Click to Change Location</span>
+          </div>
         </div>
-      </form>
-            <script src="forms.js"></script>
-            <style>
-            body {
-                background: transparent;
-                overflow-x: hidden;
-            }
-            </style>
-        </body>
-    </html>
+        <ih>Leaving From</ih>
+        <div class="result" onclick="chooseFrom()">
+          <h2 id="fromName"></h2>
+          <span id="fromFull"></span>
+          <div class="changeCont">
+            <span>Click to Change Location</span>
+          </div>
+        </div>
+        <ih>When <r>*</r></ih>
+        <div class="timeCont">
+          <input id="timeIn" name="whenRaw" type="datetime-local" required></input>
+          <select id="timeZone" name="tz">
+            <!--<option value="Pacific/Honolulu">Hawaiian Time</option>
+            <option value="America/Anchorage">Alaskan Time</option>
+            <option value="America/Los_Angeles">Pacific Time</option>
+            <option value="America/Denver">Mountain Time</option>-->
+            <option value="America/Chicago">Central Time</option>
+            <option value="America/New_York" selected>Eastern Time</option>
+          </select>
+        </div>
+        <ih>Vehicle Description <r>*</r></ih>
+        <input name="vehicleInfo" size="200" required></input>
+        <ih>Payment</ih>
+        <div class="checkCont">
+        <input type="checkbox" name="payment"></input>
+        <label for="payment">I would like passengers to cover their share of gas and/or parking.
+        </div>
+        <ih>Additional Info</ih>
+        <textarea name="info"></textarea>
+        <button class="bigGlowyButton">Create Offer!</button>
+      </div>
+    </form>
+    <script src="forms.js"></script>
+    <script>
+      //Populate some constants for the submit function
+      const isOffer = true;
+      //Populate suggestions and set the default "from" value
+      populateSuggestions().then(function() {
+        from = currentFeatures[0];
+      });
+    </script>
+    <style>
+    body {
+        background: transparent;
+        overflow-x: hidden;
+    }
+    </style>
+  </body>
+</html>

@@ -1,247 +1,434 @@
 @import url('https://fonts.googleapis.com/css2?family=Mandali&display=swap');
 
-                body {
-                    background: #222;
-                    color: #eee;
-                    font-family: 'Mandali', serif;
-                }
+:root {
+  --nav-height: 76px;
+}
 
-                .headerBar button, #fancyHeader button {
-                    background: #555;
-                    color: #eee;
-                    box-shadow: 0px 0px 3px rgba(0, 0, 0, .3);
-                    margin: 10px;
-                    font-size: 14pt;
-                    padding: 10px;
-                    border: none;
-                    border-radius: 5px;
-                    transition-duration: .3s;
-                    min-width: max-content;
-                }
+body {
+  background: #222;
+  color: #eee;
+  font-family: 'Mandali', serif;
+}
 
-                .headerBar input, #fancyHeader input {
-                    margin: 10px;
-                    font-size: 16pt;
-                    padding: 5px;
-                    padding-left: 15px;
-                    color: #eee;
-                    background: #444;
-                    border: none;
-                    border-radius: 5px;
-                }
+.headerBar {
+  background: #333;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100vw;
+  height: var(--nav-height);
+  display: flex;
+  box-shadow: 0px 3px 5px rgba(0, 0, 0, .2);
+  z-index: 5;
+}
 
-                .purpleButton {
-                    background: #a64dff !important;
-                    box-shadow: 0px 0px 3px #a64dff;
-                }
+.headerBar input {
+  width: 100%;
+}
 
-                button:hover {
-                    filter: brightness(115%);
-                }
+.headerBar #logo {
+  padding: 8px;
+}
 
-                h1, h3 {
-                    line-height: 1.2;
-                }
+.headerBar img,
+.floatingLogin img {
+  height: 50px;
+}
 
-                .bigGlowyButton {
-                    width: 70%;
-                }
+.headerBar a,
+.floatingLogin a {
+  transition-duration: .3s;
+}
 
-                .smolGlowyButton, .bigGlowyButton {
-                    margin: 20px 15% 20px 15%;
-                    padding: 15px;
-                    font-size: 13pt;
-                    background: #a64dff !important;
-                    color: #eee;
-                    border-radius: 5px;
-                    border: none;
-                    transition-duration: .2s;
-                }
+.headerBar a:hover,
+.floatingLogin a:hover {
+  background: #555;
+}
 
-                .smolGlowyButton:hover, .bigGlowyButton:hover {
-                    background: #b366ff;
-                    box-shadow: 0px 0px 10px #b366ff88;
-                }
+.headerBar button,
+.headerBar a,
+.floatingLogin button,
+.floatingLogin a {
+  display: flex;
+  align-items: center;
+}
 
-                .smolGlowyButton:active, .bigGlowyButton:active {
-                    transform: scale(0.95);
-                }
+.headerBar button img,
+.floatingLogin button img {
+  height: 28px;
+  width: 28px;
+  padding: 0px;
+}
 
-                .center {
-                    text-align: center;
-                }
+.headerBar button,
+#fancyHeader button,
+.floatingLogin button {
+  background: #555;
+  color: #eee;
+  box-shadow: 0px 0px 3px rgba(0, 0, 0, .3);
+  margin: 10px;
+  font-size: 14pt;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  transition-duration: .3s;
+  min-width: max-content;
+}
 
-                form input, form textarea, form select, .styledInput {
-                    border-radius: 3px;
-                    color: #eee;
-                    background: #222;
-                    padding: 5px;
-                    font-size: 14pt;
-                    box-shadow: inset 0px 0px 5px rgba(0, 0, 0, .3);
-                    border: none;
-                    min-width: 400px;
-                    width: 100%;
-                }
+.headerBar input,
+#fancyHeader input {
+  margin: 10px;
+  font-size: 16pt;
+  padding: 5px;
+  padding-left: 15px;
+  color: #eee;
+  background: #444;
+  border: none;
+  border-radius: 5px;
+}
 
-                form input:focus {
-                    outline: none;
-                    background: #454545;
-                }
+.purpleButton {
+  background: #a64dff !important;
+  box-shadow: 0px 0px 3px #a64dff;
+}
 
-                form input[type=checkbox], .styledCheckbox {
-                    appearance: none;
-                    background: #555;
-                    height: 30px;
-                    width: 30px !important;
-                    min-width: 30px !important;
-                    box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
-                    border-radius: 3px;
-                    margin: 10px 30px 10px 0px;
-                    transition: ease-in;
-                    transition-duration: .1s;
-                }
+.dButton {
+  margin: 20px 15% 20px 15%;
+  padding: 15px;
+  font-size: 20pt;
+  background: #5865f2 !important;
+  color: #eee;
+  border-radius: 5px;
+  border: none;
+  transition-duration: .2s;
+  text-align: center;
+}
 
-                .checkCont {
-                    display: flex;
-                    align-items: center;
-                }
+#flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  visibility: hidden;
+}
 
-                form input[type=checkbox]:checked, .styledCheckbox:checked {
-                    background: #a64dff;
-                    box-shadow: 0px 0px 5px #a64dff88;
-                }
+button:hover {
+  filter: brightness(115%);
+}
 
-                @media screen and (max-width: 600px) {
-                    form input, form textarea, form select {
-                        min-width: 200px;
-                        width: calc(100% - 10px);
-                    }
-                }
+h1,
+h3 {
+  line-height: 1.2;
+}
+
+.bigGlowyButton {
+  width: 70%;
+}
+
+.smolGlowyButton,
+.bigGlowyButton {
+  margin: 20px 15% 20px 15%;
+  padding: 15px;
+  font-size: 13pt;
+  background: #a64dff !important;
+  color: #eee;
+  border-radius: 5px;
+  border: none;
+  transition-duration: .2s;
+}
+
+.smolGlowyButton:hover,
+.bigGlowyButton:hover {
+  background: #b366ff;
+  box-shadow: 0px 0px 10px #b366ff88;
+}
+
+.smolGlowyButton:active,
+.bigGlowyButton:active {
+  transform: scale(0.95);
+}
+
+.center {
+  text-align: center;
+}
+
+form input,
+form textarea,
+form select,
+.styledInput {
+  border-radius: 3px;
+  color: #eee;
+  background: #222;
+  padding: 5px;
+  font-size: 14pt;
+  box-shadow: inset 0px 0px 5px rgba(0, 0, 0, .3);
+  border: none;
+  min-width: 400px;
+  width: 100%;
+}
+
+form input:focus {
+  outline: none;
+  background: #454545;
+}
+
+form input[type=checkbox],
+.styledCheckbox {
+  appearance: none;
+  background: #555;
+  height: 30px;
+  width: 30px !important;
+  min-width: 30px !important;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, .5);
+  border-radius: 3px;
+  margin: 10px 30px 10px 0px;
+  transition: ease-in;
+  transition-duration: .1s;
+}
+
+.checkCont {
+  display: flex;
+  align-items: center;
+}
+
+form input[type=checkbox]:checked,
+.styledCheckbox:checked {
+  background: #a64dff;
+  box-shadow: 0px 0px 5px #a64dff88;
+}
+
+@media screen and (max-width: 600px) {
+
+  form input,
+  form textarea,
+  form select {
+    min-width: 200px;
+    width: calc(100% - 10px);
+  }
+
+  #loginDetails {
+    display: none;
+  }
+
+  .dropDownInd {
+    margin: 12px !important;
+  }
+}
 
 ::-webkit-scrollbar {
-    /* width of the entire scrollbar */
-    width: 4px;
+  /* width of the entire scrollbar */
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;        /* color of the tracking area */
+  background: transparent;
+  /* color of the tracking area */
 
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #888;    /* color of the scroll thumb */
-  border-radius: 20px;       /* roundness of the scroll thumb */
+  background-color: #888;
+  /* color of the scroll thumb */
+  border-radius: 20px;
+  /* roundness of the scroll thumb */
   width: 2px !important;
 }
 
 .result {
-      position: relative;
-      background: #242424;
-      padding: 15px;
-      margin: 5px auto;
-      border-radius: 3px;
-      box-shadow: 2px 2px 3px rgba(0, 0, 0, .4);
-      transition: ease-in-out .1s;
-      width: calc(100% - 45px);
-      text-align: left;
-    }
+  position: relative;
+  background: #242424;
+  padding: 15px;
+  margin: 5px auto;
+  border-radius: 3px;
+  box-shadow: 2px 2px 3px rgba(0, 0, 0, .4);
+  transition: ease-in-out .1s;
+  width: calc(100% - 45px);
+  text-align: left;
+}
 
-    .result:hover {
-      background: #2a2a2a;
-      box-shadow: 1px 1px 2px rgba(0, 0, 0, .4);
-      transform: scale(0.97);
-    }
+.result:hover {
+  background: #2a2a2a;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, .4);
+  transform: scale(0.97);
+}
 
-    .result:active {
-      background: #555;
-      box-shadow: 1px 1px 2px rgba(0, 0, 0, .4);
-      transform: scale(0.97);
-    }
+.result:active {
+  background: #555;
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, .4);
+  transform: scale(0.97);
+}
 
-    .result h2 {
-      margin: 0px auto;
-      line-height: 28px;
-    }
+.result h2 {
+  margin: 0px auto;
+  line-height: 28px;
+}
 
-    #formPane, #searchPane {
-      position: absolute;
-      top: 0px;
-      transition: left ease .5s;
-    }
+#formPane,
+#searchPane {
+  position: absolute;
+  top: 0px;
+  transition: left ease .5s;
+}
 
-    #formPane {
-      left: 105vw;
-      width: 100vw;
-    }
+#formPane {
+  left: 105vw;
+  width: 100vw;
+}
 
-    #searchPane {
-      left: 0vw;
-      width: 100vw;
-      height: 100vh;
-      overflow-y: auto;
-      text-align: center;
-    }
+#searchPane {
+  left: 0vw;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+  text-align: center;
+}
 
-    #formPane h1 {
-      text-align: center;
-    }
+#formPane h1 {
+  text-align: center;
+}
 
-    .changeCont {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 100%;
-      height: 100%;
-      background: #222;
-      opacity: 0;
-      transition: ease .2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+.changeCont {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background: #222;
+  opacity: 0;
+  transition: ease .2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    .result:hover .changeCont {
-      opacity: 1;
-    }
+.result:hover .changeCont {
+  opacity: 1;
+}
 
-    .changeCont span {
-      text-align: center;
-      line-height: 100%;
-      font-size: 20px;
-      color: #b366ff !important;
-    }
+.changeCont span {
+  text-align: center;
+  line-height: 100%;
+  font-size: 20px;
+  color: #b366ff !important;
+}
 
-    #rideForm {
-      overflow-x: hidden;
-      width: 100vw;
-    }
+#rideForm {
+  overflow-x: hidden;
+  width: 100vw;
+}
 
-    .result span {
-      color: #aaa;
-    }
+.result span {
+  color: #aaa;
+}
 
-    #searchBox {
-      padding: 15px;
-      width: calc(100% - 30px);
-      background: #494549;
-      border-bottom: solid 5px #a64dff;
-    }
+#searchBox {
+  padding: 15px;
+  width: calc(100% - 30px);
+  background: #494549;
+  border-bottom: solid 5px #a64dff;
+}
 
-    .requiredInd, r {
-      margin: 0px;
-      color: firebrick;
-    }
+.requiredInd,
+r {
+  margin: 0px;
+  color: firebrick;
+}
 
-    .timeCont {
+.timeCont {
   display: flex;
 }
+
 #timeIn {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
+
 #timeZone {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   box-shadow: none;
   max-width: min-content;
+}
+
+#loginBox {
+  display: flex;
+  background: #444;
+  align-items: center;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  box-shadow: -2px 0px 2px #0003;
+  height: 100%;
+  text-align: left;
+}
+
+#loginBox h3 {
+  margin: 2px 0px;
+}
+
+.loginPic {
+  border-radius: 5px;
+  padding: 0px;
+  margin: 5px;
+  height: 58px;
+}
+
+.ddContent {
+  max-height: 0px;
+  overflow: hidden;
+  transition-duration: .5s;
+  background: #444;
+  box-shadow: -2px 0px 2px #0003;
+}
+
+.dropdown:hover {
+  /*background: #444;*/
+}
+
+.dropdown:hover:not(.ddNoOpen) .ddContent {
+  max-height: 250px;
+  border-bottom-left-radius: 5px;
+}
+
+.dropdown:hover:not(.ddNoOpen).floatingLogin .ddContent {
+  border-bottom-right-radius: 5px;
+}
+
+.dropdown:hover:not(.ddNoOpen) .ddLabel {
+  border-bottom-left-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+}
+
+.ddContent a {
+  padding: 10px 15px;
+  color: white;
+  text-decoration: none;
+}
+
+.dropDownInd {
+  height: 20px !important;
+  margin: 0px 4px 0px 12px;
+}
+
+#loginDetails {
+  margin: 0px 15px;
+}
+
+.floatingLogin {
+  height: var(--nav-height);
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  width: min-content;
+}
+
+.floatingLogin #loginBox {
+  border-radius: 10px;
+}
+
+#loading {
+  width: 200px;
+  height: 200px;
+  left: calc(50% - 100px);
+  top: calc(50% - 50px);
+  border: none;
+  position: absolute;
 }
