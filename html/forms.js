@@ -70,7 +70,10 @@ document.getElementById("rideform").onsubmit = async function(e) {
       var from;
       var to;
       var searchingTo = true;
-      document.getElementById("timeZone").value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      /*var userTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if(userTz == "America/New_York" || userTz == "America/Chicago"){
+        document.getElementById("timeZone").value = userTz;
+      }*/
 
       function trimFullName(feature) {
         return trimLabel(feature.display_name);

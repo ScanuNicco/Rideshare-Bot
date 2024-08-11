@@ -47,16 +47,16 @@
                 <ih>Creation Time</ih>
                 <p id="creation" class="noEdit"></p>
                 <ih>Status</ih>
-                <input id="status" name="status" placeholder='e.g "3 seats left", "Still need a ride"'></input>
+                <input id="status" name="status" size="200" placeholder='e.g "3 seats left", "Still need a ride"'></input>
                 <ih>Additional Info</ih>
-                <textarea id = "addInfo" name="info"></textarea>
+                <textarea id = "addInfo" name="info" size="1000"></textarea>
                 <div id="offerOnly">
                     <ih>Vehicle Info</ih>
-                    <input id="veInfo" name="vehicleInfo"></input>
+                    <input id="veInfo" name="vehicleInfo" size="200"></input>
                 </div>
                 <div class="checkCont">
                 <input type="checkbox" name="payment"></input>
-                <label for="payment">I would like passengers to cover their share of gas and/or parking.</label>
+                <label for="payment" id="payLabel">I am offering to pay for a portion of gas/parking expenses.</label>
                 </div>
                 
                 <button class="bigGlowyButton" id="saveButton">Save Changes</button>
@@ -98,7 +98,8 @@
 
                         if(isOffer) {
                             document.getElementById("offerOnly").style.display = "block";
-                            document.getElementById("veInfo").value = editingRide["veinfo"] ?? "";
+                            document.getElementById("veInfo").value = editingRide["vehicleinfo"] ?? "";
+                            payLabel.innerText = "I would like passengers to cover their share of gas and/or parking.";
                         }
 
                         if(editingRide.deleted) {
@@ -108,12 +109,12 @@
                             document.getElementById("canceled").style.display = "block";
                         }
                         
-                        document.getElementsByName("payment").checked = editingRide["payment"];
+                        document.getElementsByName("payment")[0].checked = editingRide["payment"];
                         console.log("got data");
 
                         //Populate the from and to variables in case the origin and destination aren't changed
-                        from = {lon: editingRide.olong, lat: editingRide.olat, name: editingRide.oname, display_name: editingRide.olabel, type: editingRide.otype};
-                        to = {lon: editingRide.dlong, lat: editingRide.dlat, name: editingRide.dname, display_name: editingRide.dlabel, type: editingRide.dtype};
+                        from = {lon: editingRide.olong, lat: editingRide.olat, name: editingRide.olname, display_name: editingRide.ollabel, type: editingRide.oltype};
+                        to = {lon: editingRide.dlong, lat: editingRide.dlat, name: editingRide.dlname, display_name: editingRide.dllabel, type: editingRide.dltype};
                 }
 
                 function zeroOffset(num){

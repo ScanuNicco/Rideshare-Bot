@@ -38,10 +38,10 @@ create table RideEvent(
 	ID					serial primary key,
 	cat					varchar(200),
 	departureTime		timestamp, --departure time
-	rideStatus			varchar(40),
+	rideStatus			varchar(200),
 	createdTime		    timestamp,
 	ridePayment			bool,
-	rideInfo			varchar(200),
+	rideInfo			varchar(1000),
 	MessageID			int,
 	originLocation		int,
 	destinLocation		int,
@@ -55,7 +55,7 @@ create table RideEvent(
 
 create table RideOffer(
 	eventID 			int primary key,
-	vehicleInfo			varchar(100),
+	vehicleInfo			varchar(200),
 	foreign key(eventID) references RideEvent(ID)
 );
 

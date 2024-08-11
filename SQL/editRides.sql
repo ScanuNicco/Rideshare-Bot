@@ -26,8 +26,6 @@ BEGIN
 	-- Ensures No Null Arguements
 	if (rideID is null or
 		depTime is null or
-		status is null or
-		info is null or
 		oname is null or
 		olabel is null or
 		otype is null or
