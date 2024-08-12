@@ -130,13 +130,17 @@ const editRides = async function(dcClient, args, res) {
 
 const userInServer = async function(dcClient, args, res) {
     const code = args["code"];
+    const redir = constants.HOSTNAME + "oauthLanding.html";
+
+    Logger.logDebug(args);
+    Logger.logDebug(redir);
 
     const params = new URLSearchParams();
     params.append('client_id', process.env.CLIENT_ID);
     params.append('client_secret', process.env.CLIENT_SECRET);
     params.append('grant_type', 'authorization_code');
     params.append('code', code);
-    params.append('redirect_uri', "http://localhost:8081/oauthLanding.html");
+    params.append('redirect_uri', redir);
     params.append('scope', 'identify');
 
     //First, we convert the OAUTH code to a token that can be used in future API calls
@@ -148,6 +152,8 @@ const userInServer = async function(dcClient, args, res) {
         },
     });
     const token = await response.json();
+
+    Logger.logDebug(token);
 
     //We then get the user's information
     response = await fetch('https://discord.com/api/users/@me', {
@@ -168,7 +174,7 @@ const userInServer = async function(dcClient, args, res) {
         console.log(guildUserData);
     } catch (e) {
         if(e.rawError.code == 10007) {
-            Logger.logDebug(`Regufusing to authenticate ${user.tag} because they are not a member of the guild.`);
+            Logger.logDebug(`Refusing to authenticate ${user.tag} because they are not a member of the guild.`);
             res.end(JSON.stringify({error: 1}));
         } else {
             res.writeHead(500);

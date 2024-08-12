@@ -1,3 +1,5 @@
+CREATE EXTENSION pgcrypto;
+
 create table DiscordUser (
 	ID 					serial,
 	avatarURL			varchar(200),
