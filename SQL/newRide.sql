@@ -76,7 +76,6 @@ if (cat is null or
 	dtype is null or
 	dlat is null or
 	dlong is null or
-	avatarurlarg is null or
 	usernamearg is null or
 	displaynamearg is null or
 	discordidarg is null or

@@ -7,7 +7,7 @@ declare
 declare userid int;
 begin
  -- logic
-	if discordidarg is null or displaynamearg is null or usernamearg is null or avatarurlarg is null then
+	if discordidarg is null or displaynamearg is null or usernamearg is null then
 		raise exception 'No Nulls!';
 	end if;
 
