@@ -22,10 +22,10 @@ async function deployDB() {
         user: username,
         password: pw,
         database: 'postgres',
-        ssl: {
+        ssl: false/*{
             sslmode: 'require',
             rejectUnauthorized: false
-        }});
+        }*/});
     await postgres.connect();
     console.log("Connected to PostgreSQL as " + username);
 
@@ -40,10 +40,10 @@ async function deployDB() {
         user: username,
         password: pw,
         database: process.env.PG_DATABASE,
-        ssl: {
+        ssl: false/*{
             sslmode: 'require',
             rejectUnauthorized: false
-        }});
+        }*/});
     await newDB.connect(); //Create the client for the new DB
     console.log("Connected to database " + process.env.PG_DATABASE);
 
