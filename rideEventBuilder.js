@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Events, hyperlink } = require('discord.js');
+const { SlashCommandBuilder, hyperlink } = require('discord.js');
 const { v4: uuidv4 } = require('uuid');
 const constants = require("./constants.js");
 var LocalStorage = require('node-localstorage').LocalStorage;
@@ -73,7 +73,8 @@ class RideEvent {
         this.when = obj.when;
         this.payment = obj.payment;
         this.info = clean(obj.info);
-        this.message = obj.message; //This is a Data Object, not the actual Message object that has functions and stuff. Use getMessageFromRideEvent() for that.
+        this.channelID = obj.channelID;
+        this.messageID = obj.messageID; //This is a Data Object, not the actual Message object that has functions and stuff. Use getMessageFromRideEvent() for that.
         this.destName = this.dest.name;
         this.destDetails = this.dest.display_name;
         this.whenceName = this.whence.name;
@@ -121,22 +122,19 @@ class RideEvent {
         return "Placeholder RideEvent message.";
     }
 
-    async getMessageFromRideEvent(client) {
-        const channel = client.channels.cache.get(this.message.channelId);
-        const message = await channel.messages.fetch(this.message.id);
-        return message;
+    async getMessageFromRideEvent(bot) {
+        bot.getMessage(this.messageID, this.channelID); //this.message.channelId, this.message.id
     }
 
-    async replaceWithStatus(client, status) {
-        const message = await this.getMessageFromRideEvent(client);
-        message.edit(status);
+    async replaceWithStatus(bot, status) {
+        bot.editMessage(this.messageID, this.channelID)
         this.status = status;
         this.saveStatus();
     }
 
-    async appendStatus(client, status, strikethrough) {
+    async appendStatus(bot, status, strikethrough) {
         this.status = status;
-        this.updateRideMessage(client)
+        this.updateRideMessage(bot)
         this.saveStatus();
     }
 
@@ -149,7 +147,7 @@ class RideEvent {
         pgClient.end();
     }
 
-    async cancel(client, interaction) {
+    async cancel(bot, interaction) {
         this.deleted = true;
         var pgClient = pg.getNewClient();
         await pgClient.connect();
@@ -158,16 +156,13 @@ class RideEvent {
         pgClient.end();
     }
 
-    async sendRideMessage(client, channelID) {
+    async sendRideMessage(bot, channelID) {
         Logger.logDebug("Sending ride message in channel: " + channelID);
-        var channel = await client.channels.fetch(channelID);
-        this.message = await channel.send(this.writeMessageText(), {"allowedMentions": { "users" : []}});
-        return this.message;
+        return bot.sendMessageInChannel(channelID, this.writeMessageText());
     }
 
-    async updateRideMessage(client) {
-        const message = await this.getMessageFromRideEvent(client);
-        message.edit(this.writeMessageText(), {"allowedMentions": { "users" : []}});
+    async updateRideMessage(bot) {
+        bot.editMessage(this.messageID, this.channelID, this.writeMessageText());
     }
 
     static getTimeString(departureTime) { //Returns the time as a sting in EASTERN TIME
@@ -198,32 +193,14 @@ class Offer extends RideEvent {
         return message;
     }
 
-    async cancel(client, interaction) {
+    async cancel(bot, interaction) {
         await super.cancel(interaction);
-        await this.replaceWithStatus(client, `**${this.target.username}** has cancelled their ride offer to \`${this.destName}\`.`);
+        await this.replaceWithStatus(bot, `**${this.target.username}** has cancelled their ride offer to \`${this.destName}\`.`);
         interaction.reply({content: 'Ride offer cancelled. Please be sure to inform anyone who was planning to ride with you!', ephemeral: true});
     }
 
-    async sendControls(client) {
-        const userObj = await client.users.fetch(this.target.id);
-        const userDM = await userObj.createDM();
-		const row = new ActionRowBuilder()
-			.addComponents(
-                new ButtonBuilder()
-					.setCustomId('editRide')
-					.setLabel('Edit Offer')
-					.setStyle(ButtonStyle.Primary),
-				new ButtonBuilder()
-					.setCustomId('setStatus')
-					.setLabel('Set Status')
-					.setStyle(ButtonStyle.Secondary),
-				new ButtonBuilder()
-					.setCustomId('cancelOff')
-					.setLabel('Cancel this Offer')
-					.setStyle(ButtonStyle.Danger),
-			);
-		const controls = await userDM.send({content: "**Handy Control Panel:** Ride offer for `" + this.destName + "`", components: [row]});
-        return controls.id;
+    async sendControls(bot) {
+        return await bot.sendOfferControls(this.target.id, "**Handy Control Panel:** Ride offer for `" + this.destName + "`");
     }
 
     static loadEvents() {
@@ -241,36 +218,14 @@ class Request extends RideEvent {
         return message;
     }
 
-    async cancel(client, interaction) {
+    async cancel(bot, interaction) {
         await super.cancel(interaction);
-        await this.replaceWithStatus(client, `**${this.target.username}** has cancelled their request for a ride to \`${this.destName}\`.`);
+        await this.replaceWithStatus(bot, `**${this.target.username}** has cancelled their request for a ride to \`${this.destName}\`.`);
         interaction.reply({content: 'Request cancelled. Please be sure to inform anyone who offered you a ride!', ephemeral: true});
     }
 
-    async sendControls(client) {
-        const userObj = await client.users.fetch(this.target.id);
-        const userDM = await userObj.createDM();
-		const row = new ActionRowBuilder()
-			.addComponents(
-                new ButtonBuilder()
-                    .setCustomId('editRide')
-                    .setLabel('Edit Request')
-                    .setStyle(ButtonStyle.Primary),
-                new ButtonBuilder()
-                    .setCustomId('setStatus')
-                    .setLabel('Set Status')
-                    .setStyle(ButtonStyle.Secondary),
-				new ButtonBuilder()
-					.setCustomId('foundRide')
-					.setLabel('I Found a Ride!')
-					.setStyle(ButtonStyle.Secondary),
-				new ButtonBuilder()
-					.setCustomId('cancelReq')
-					.setLabel('Cancel this Request')
-					.setStyle(ButtonStyle.Danger),
-			);
-		const controls = await userDM.send({content: "**Handy Control Panel:** Ride request for `" + this.destName + "`", components: [row]});
-        return controls.id;
+    async sendControls(bot) {
+        return await bot.sendRequestControls(this.target.id, "**Handy Control Panel:** Ride request for `" + this.destName + "`");
     }
 
     static loadEvents() {
