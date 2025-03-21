@@ -12,3 +12,7 @@ start.sh
 
 # Rideshare bot ride data
 ridedata/
+
+# micro logs
+log.txt
+*/log.txt

@@ -130,13 +130,17 @@ const editRides = async function(bot, args, res) {
 
 const userInServer = async function(bot, args, res) {
     const code = args["code"];
+    const redir = constants.HOSTNAME + "oauthLanding.html";
+
+    Logger.logDebug(args);
+    Logger.logDebug(redir);
 
     const params = new URLSearchParams();
     params.append('client_id', process.env.CLIENT_ID);
     params.append('client_secret', process.env.CLIENT_SECRET);
     params.append('grant_type', 'authorization_code');
     params.append('code', code);
-    params.append('redirect_uri', constants.HOSTNAME + "oauthLanding.html");
+    params.append('redirect_uri', redir);
     params.append('scope', 'identify');
 
     //First, we convert the OAUTH code to a token that can be used in future API calls
@@ -149,6 +153,8 @@ const userInServer = async function(bot, args, res) {
         },
     });
     const token = await response.json();
+
+    Logger.logDebug(token);
 
     //We then get the user's information
     //Once again, calling as the USER, not the bot
