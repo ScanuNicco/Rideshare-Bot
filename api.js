@@ -7,7 +7,7 @@ const constants = require("./constants.js");
 const { Offer, Request, RideEvent } = require("./rideEventBuilder.js");
 
 
-const getLoginInfo = async function(dcClient, args, res) {
+const getLoginInfo = async function(bot, args, res) {
     var stateID = args["stateID"];
     if(stateID == null) {
         res.end('{"error": "Must supply stateID"}');
@@ -25,7 +25,7 @@ const getLoginInfo = async function(dcClient, args, res) {
         var valid =  pgResponse.rows[0];
         dataToSend.stateValid = valid['isvalid'];
         if(valid['isvalid']){
-            var discordInfo = await dcClient.users.fetch(valid['did']);
+            var discordInfo = await bot.fetchUserInfo(valid['did']);
             dataToSend.user = {
                 id: valid['id'],
                 userName: discordInfo.username,
@@ -91,7 +91,7 @@ const viewSingleRide = async function(args, res) {
     }
 };
 
-const editRides = async function(dcClient, args, res) {
+const editRides = async function(bot, args, res) {
     var rideID = args["rideID"];
     var stateID = args["stateID"];
     if(rideID == null) {
@@ -120,7 +120,7 @@ const editRides = async function(dcClient, args, res) {
         await pgClient.end();
         //We've updated the DB, but we still need to update the message on Discord
         var rdEvt = await RideEvent.getRideById(rideID);
-        rdEvt.updateRideMessage(dcClient);
+        rdEvt.updateRideMessage(bot);
         res.end('{"status": "success"}');
     } catch (e) {
         Logger.logError(e);
@@ -128,7 +128,7 @@ const editRides = async function(dcClient, args, res) {
     }
 };
 
-const userInServer = async function(dcClient, args, res) {
+const userInServer = async function(bot, args, res) {
     const code = args["code"];
     const redir = constants.HOSTNAME + "oauthLanding.html";
 
@@ -144,6 +144,7 @@ const userInServer = async function(dcClient, args, res) {
     params.append('scope', 'identify');
 
     //First, we convert the OAUTH code to a token that can be used in future API calls
+    //Note that here we are calling the Discord API AS THE USER, not the bot. Hence, I am not including this in bot.js
     var response = await fetch("https://discord.com/api/oauth2/token", {
         method: 'POST',
         body: params,
@@ -156,6 +157,7 @@ const userInServer = async function(dcClient, args, res) {
     Logger.logDebug(token);
 
     //We then get the user's information
+    //Once again, calling as the USER, not the bot
     response = await fetch('https://discord.com/api/users/@me', {
 		method: "GET",
         headers: {
@@ -168,22 +170,18 @@ const userInServer = async function(dcClient, args, res) {
     const uid = user["id"];
     console.log(uid);
 
-    const guild = await dcClient.guilds.fetch(process.env.GUILD_ID);
-    try{
-        const guildUserData = await guild.members.fetch(uid);
-        console.log(guildUserData);
-    } catch (e) {
-        if(e.rawError.code == 10007) {
-            Logger.logDebug(`Refusing to authenticate ${user.tag} because they are not a member of the guild.`);
+    switch (bot.isUserInServer(uid)) {
+        case 1: //User is not in the server
+            Logger.logDebug(`Regufusing to authenticate ${user.tag} because they are not a member of the guild.`);
             res.end(JSON.stringify({error: 1}));
-        } else {
+            break;
+        case 2: //Unknown error occured
             res.writeHead(500);
-            Logger.logError(e);
-            res.end(JSON.stringify({error: 2}));
-        }
+            res.end(JSON.stringify({error: 1}));
+            break;
     }
 
-    const userInfo = await dcClient.users.fetch(uid); //Full user info returned by querying the API as Rideshare Bot
+    const userInfo = await bot.fetchUserInfo(uid); //Full user info returned by querying the API as Rideshare Bot
 
     var pgClient = pg.getNewClient();
     await pgClient.connect();
@@ -259,11 +257,11 @@ const search = async function(args, res) {
     await pgClient.end();
 };
 
-const submitRideEvent = async function(dcClient, args, res) {
+const submitRideEvent = async function(bot, args, res) {
     var pgClient = pg.getNewClient();
     await pgClient.connect();
 
-
+    // Confirm that the user is logged in
     var validateQuery = 'SELECT * from validateState($1)';
     const pgResponse = await pgClient.query(validateQuery, [args.stateID]);
     var valid =  pgResponse.rows[0];
@@ -280,7 +278,7 @@ const submitRideEvent = async function(dcClient, args, res) {
 	args['when'] = moment.tz(args['whenRaw'], args['tz']).valueOf();
 	Logger.logDebug(args['when']);
 	args['timestamp'] = Date.now();
-    args['target'] = await dcClient.users.fetch(valid['did']);
+    args['target'] = await bot.fetchUserInfo(valid['did']);
 
 	//Determine the category
 	var rideLat = args.dest.lat;
@@ -313,24 +311,18 @@ const submitRideEvent = async function(dcClient, args, res) {
 	Logger.logDebug(re);
 
     //Send the ride message
-	var messageResult = await re.sendRideMessage(dcClient, curCatID);
+	var messageResult = await re.sendRideMessage(bot, curCatID);
 	if(re.message == null) {
 		Logger.logError("Error while processing ");
 		Logger.logError("Message did not send for some reason!");
 	}
     Logger.logDebug(messageResult);
 	if(args.urgent) {
-		const message = re.writeUpdateText();
-		const update = new EmbedBuilder()
-			.setColor(0x0099FF)
-			.setTitle(":rotating_light: Urgent Request :rotating_light:")
-			.addFields({name: "Details:", value: message}, {name: "Additional Info:", value: (re.info ?? "None")});
-		var channel = await dcClient.channels.fetch(constants.UPDATE_CHANNEL_ID);
-		channel.send({content: "<@&1027782166811254805>", embeds: [update]});
+        bot.setUrgentRequest(":rotating_light: Urgent Request :rotating_light:", re.writeUpdateText(), re.info);
 	}
 
     //Send the controls
-    var controlsId = await re.sendControls(dcClient);
+    var controlsId = await re.sendControls(bot);
 
     //Store the new RideEvent in the database
     var q = "call newride($1::varchar(200), to_timestamp($2 / 1000.0)::timestamp, $3::varchar(200), to_timestamp($4 / 1000.0)::timestamp, $5::bool, $6::varchar(200), $7::bigint, $8::bigint, $9::bigint, $10::bigint, $11::varchar(200), $12::varchar(200), $13::varchar(200), $14::numeric, $15::numeric, $16::varchar(200), $17::varchar(200), $18::varchar(200), $19::numeric, $20::numeric, $21::varchar(200), $22::varchar(32), $23::varchar(32), $24::bigint, $25::bool, $26::varchar(200), $27::bool);";
@@ -366,8 +358,7 @@ const submitRideEvent = async function(dcClient, args, res) {
 
     //If we found a match, let's alert the person who sent the request
     if(foundMatch) {
-        var channel = await dcClient.channels.fetch(curCatID);
-		channel.send(resultText);
+		bot.sendMessageInChannel(curCatID, resultText);
     }
 
     
