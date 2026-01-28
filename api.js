@@ -318,7 +318,7 @@ const submitRideEvent = async function(bot, args, res) {
 	}
     Logger.logDebug(messageResult);
 	if(args.urgent) {
-        bot.setUrgentRequest(":rotating_light: Urgent Request :rotating_light:", re.writeUpdateText(), re.info);
+        bot.sendUrgentRequest(":rotating_light: Urgent Request :rotating_light:", `${re.target.username} is looking for a ride from ${re.whenceName} to ${re.destName} on ${Request.getTimeString(re.departuretime)}. ${Request.genRideLink(re.messageid, re.channelid, re.guildid)}\n`, re.info);
 	}
 
     //Send the controls

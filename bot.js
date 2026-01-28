@@ -3,6 +3,7 @@ const path = require('node:path');
 const fs = require('node:fs');
 const Logger = require("./logger.js");
 var schedule = require('node-schedule');
+const constants = require("./constants.js");
 const { RideCommandBuilder, Offer, Request, RideEvent } = require("./rideEventBuilder.js");
 
 
@@ -72,7 +73,7 @@ class RideshareBot {
             Logger.logDebug("Recieved button interaction of type " + interaction.customId);
             // --- Hande Create Buttons ---
             if(interaction.customId == 'newOffer'){
-                this.client.commands.get("offer").execute(interaction);
+                RideCommandBuilder.genLink(interaction, "offer");
                 return;
             } else if(interaction.customId == 'newRequest'){
                 RideCommandBuilder.genLink(interaction, "request", false);
@@ -217,9 +218,9 @@ class RideshareBot {
 		const update = new EmbedBuilder()
 			.setColor(0x0099FF)
 			.setTitle(title)
-			.addFields({name: "Details:", value: message}, {name: "Additional Info:", value: (info ?? "None")});
-		var channel = await this.client.channels.fetch(constants.UPDATE_CHANNEL_ID);
-		channel.send({content: "<@&1027782166811254805>", embeds: [update]});
+			.addFields([{name: "Details:", value: message}, {name: "Additional Info:", value: (info ?? "None")}]);
+		var channel = await this.client.channels.fetch(constants.UPDATE_CHANNEL_ID); 
+		channel.send({content: "<@&1027782166811254805>", embeds: [update]}); 
     }
 
     async isUserInServer(userID) {
