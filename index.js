@@ -62,6 +62,8 @@ http.createServer(function (req, res) {
 					api.submitRideEvent(bot, bodyJSON, res);
 				} else if (req.url == "/api/userInServer") {
 					api.userInServer(bot, bodyJSON, res);
+				} else if (req.url == "/api/getOauthLink") {
+					api.getOauthLink(res);
 				} else {
 					res.writeHead(404, {'Content-Type': 'text/html'});
 					Logger.logDebug("Not Found: " + req.url);

@@ -365,6 +365,13 @@ const submitRideEvent = async function(bot, args, res) {
     await pgClient.end();
 };
 
+const getOauthLink = async function(res) {
+    const redir = constants.HOSTNAME + "oauthLanding.html";
+    const oauthLink = `https://discord.com/oauth2/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(redir)}&scope=identify+guilds`;
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    res.end(JSON.stringify({link: oauthLink}));
+}
+
 //Stack overflow code for coordinates
 function getDistance(lat1, lon1, lat2, lon2) {
     var R = 3958.8; // Radius of the earth in miles
@@ -387,5 +394,6 @@ module.exports = {
     submitRideEvent,
     viewSingleRide,
     editRides, 
-    search
+    search,
+    getOauthLink
 };
