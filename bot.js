@@ -167,7 +167,7 @@ class RideshareBot {
     }
 
     async sendOfferControls(userID, title) {
-        const userObj = await fetchUserInfo(userID);
+        const userObj = await this.fetchUserInfo(userID);
         const userDM = await userObj.createDM();
 		const row = new ActionRowBuilder()
 			.addComponents(
