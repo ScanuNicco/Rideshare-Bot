@@ -29,7 +29,7 @@ async function userInServer(authcode) { //Checks whether the user is a member of
 }
 
 function populateLoginBox(userInfo) { //Populates the login box with a user's info
-        document.getElementById('loginBox').innerHTML = `<img class='dropDownInd' src='dropind.svg'><div id='loginDetails'><h3 class='loginDN'>${userInfo.displayName}</h3><span class='loginUN'>${userInfo.userName}</span></div><img class='loginPic' src='${userInfo.avatar}'>`;
+        document.getElementById('loginBox').innerHTML = `<img class='dropDownInd' src='dropind.svg'><div id='loginDetails'><h3 class='loginDN'>${stopXSS(userInfo.displayName)}</h3><span class='loginUN'>${userInfo.userName}</span></div><img class='loginPic' src='${userInfo.avatar}'>`;
         document.getElementById('loginDD').classList.remove('ddNoOpen');
 }
 
@@ -41,4 +41,15 @@ async function doOauthLogin() { //Generates the OAuth2 link for Discord login
         const json = await result.json();
         console.log(json);
         window.location.href = json.link;
+}
+
+function stopXSS(str) {
+        const htmlEscapeMap = {
+                '&': '&#x0026;',
+                '<': '&#x003c;',
+                '>': '&#x003e;',
+                '"': '&#x0022;',
+                "'": '&#x0027;'
+        };
+        return str.replace(/[&<>"']/g, char => htmlEscapeMap[char]);
 }

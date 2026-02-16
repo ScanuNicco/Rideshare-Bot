@@ -32,8 +32,8 @@ async function getResults(q) {
 	var pgClient = pg.getNewClient();
     await pgClient.connect();
 
-    var updateQuery = `SELECT * FROM searchrides('d', '${q}')`;
-	const pgResponse = await pgClient.query(updateQuery);
+    var updateQuery = `SELECT * FROM searchrides('d', $1)`;
+	const pgResponse = await pgClient.query(updateQuery, [q]);
     var allRides =  pgResponse.rows;
 
     const result = new EmbedBuilder()
