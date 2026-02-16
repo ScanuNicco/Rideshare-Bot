@@ -14,7 +14,7 @@ create or replace function getDailyUpdate() --There is no technical reason this 
 $$
 declare
 begin
-	return query select departureTime as departureTime, origin.lname as originname, dest.lname as destinname, u.displayname, rr.eventid is null as isoffer, d.dmessageid as messageid, d.dchannelid as channelid, d.dguildid as dguildid 
+	return query select re.departureTime as departureTime, origin.lname as originname, dest.lname as destinname, u.displayname, rr.eventid is null as isoffer, d.dmessageid as messageid, d.dchannelid as channelid, d.dguildid as dguildid 
 	from rideevent re join ridelocation dest on re.originlocation = dest.id
 	join ridelocation origin on re.destinlocation = origin.id
 	join discordmessage d on d.id = re.messageid

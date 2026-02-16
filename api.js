@@ -318,7 +318,7 @@ const submitRideEvent = async function(bot, args, res) {
 	}
     Logger.logDebug(messageResult);
 	if(args.urgent) {
-        bot.setUrgentRequest(":rotating_light: Urgent Request :rotating_light:", re.writeUpdateText(), re.info);
+        bot.sendUrgentRequest(":rotating_light: Urgent Request :rotating_light:", `${re.target.username} is looking for a ride from ${re.whenceName} to ${re.destName} on ${Request.getTimeString(re.departuretime)}. ${Request.genRideLink(re.messageid, re.channelid, re.guildid)}\n`, re.info);
 	}
 
     //Send the controls
@@ -331,6 +331,7 @@ const submitRideEvent = async function(bot, args, res) {
     const pgResult = await pgClient.query(q, pgArgs);
 	res.writeHead(201, {'Content-Type': 'application/json'});
     res.end(JSON.stringify({status: 'Success'}));
+
 
 
     //Get all rides from the DB
@@ -365,6 +366,13 @@ const submitRideEvent = async function(bot, args, res) {
     await pgClient.end();
 };
 
+const getOauthLink = async function(res) {
+    const redir = constants.HOSTNAME + "oauthLanding.html";
+    const oauthLink = `https://discord.com/oauth2/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(redir)}&scope=identify+guilds`;
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    res.end(JSON.stringify({link: oauthLink}));
+}
+
 //Stack overflow code for coordinates
 function getDistance(lat1, lon1, lat2, lon2) {
     var R = 3958.8; // Radius of the earth in miles
@@ -387,5 +395,6 @@ module.exports = {
     submitRideEvent,
     viewSingleRide,
     editRides, 
-    search
+    search,
+    getOauthLink
 };

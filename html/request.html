@@ -7,7 +7,7 @@
             <form id="rideform" rr_submit_endpoint="/api/submitRideEvent">
       <div id="searchPane">
         <h1 id="searchTitle">Pick a Destination</h1>
-        <input id="searchBox" placeholder="Search for a different location" oninput="populateSuggestions()"></input>
+        <input id="searchBox" placeholder="Search for a different location" oninput="populateSuggestions()" onkeydown="noEnter(event)"></input>
         <div id="suggestions"></div>
       </div>
       <div id="formPane">
