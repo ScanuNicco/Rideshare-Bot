@@ -113,9 +113,10 @@ class RideEvent {
         //Put data in dest and whence objects for compatibility
         res.dest = {lat: res.dlat, lon: res.dlong, name: res.dlname, display_name: res.dllabel, type: res.dltype};
         res.whence = {lat: res.olat, lon: res.olong, name: res.olname, display_name: res.ollabel, type: res.oltype};
-        res.message = {id: res.dmessageid, guildId: res.dguildid, channelId: res.dchannelid};
+        res.channelID = res.dchannelid;
+        res.messageID = res.dmessageid;
         res.target = {id: res.duserid, username: res.username, displayname: res.displayname, avatarurl: res.avatarurl};
-        return res.isOffer ? new Offer(res) : new Request(res);
+        return res.isoffer ? new Offer(res) : new Request(res);
     }
 
     writeMessageText() {
@@ -127,7 +128,7 @@ class RideEvent {
     }
 
     async replaceWithStatus(bot, status) {
-        bot.editMessage(this.messageID, this.channelID)
+        await bot.editMessage(this.messageID, this.channelID, status);
         this.status = status;
         this.saveStatus();
     }
@@ -194,7 +195,7 @@ class Offer extends RideEvent {
     }
 
     async cancel(bot, interaction) {
-        await super.cancel(interaction);
+        await super.cancel(bot, interaction);
         await this.replaceWithStatus(bot, `**${this.target.username}** has cancelled their ride offer to \`${this.destName}\`.`);
         interaction.reply({content: 'Ride offer cancelled. Please be sure to inform anyone who was planning to ride with you!', ephemeral: true});
     }
@@ -219,7 +220,7 @@ class Request extends RideEvent {
     }
 
     async cancel(bot, interaction) {
-        await super.cancel(interaction);
+        await super.cancel(bot, interaction);
         await this.replaceWithStatus(bot, `**${this.target.username}** has cancelled their request for a ride to \`${this.destName}\`.`);
         interaction.reply({content: 'Request cancelled. Please be sure to inform anyone who offered you a ride!', ephemeral: true});
     }

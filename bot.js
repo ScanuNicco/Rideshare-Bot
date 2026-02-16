@@ -68,7 +68,7 @@ class RideshareBot {
         });
 
         /* Handle button interactions */
-        this.client.on(Events.InteractionCreate, async function(interaction) {
+        this.client.on(Events.InteractionCreate, async (interaction) => {
             if (!(interaction.isButton() || interaction.isModalSubmit())) return;
             Logger.logDebug("Recieved button interaction of type " + interaction.customId);
             // --- Hande Create Buttons ---
@@ -97,13 +97,13 @@ class RideshareBot {
             Logger.logDebug(rdEvt);
             if(interaction.customId == 'cancelReq' || interaction.customId == 'cancelOff') { //The user clicked a cancel button
                 if(rdEvt.deleted !== true){
-                    rdEvt.cancel(client, interaction);
+                    rdEvt.cancel(this, interaction);
                 } else {
                     interaction.reply({content: 'ERROR: RideEvent has already been cancelled', ephemeral: true});
                 }
             } else if (interaction.customId == "foundRide"){
                 if(rdEvt.deleted !== true){
-                    await rdEvt.appendStatus(client, `Good News!  ${rdEvt.target.username} found a ride.`, true);
+                    await rdEvt.appendStatus(this, `Good News!  ${rdEvt.target.username} found a ride.`, true);
                     interaction.reply({content: 'Awesome news! I\'m thrilled that I was able to help you get to your destination.', ephemeral: true});
                 } else {
                     interaction.reply({content: 'ERROR: Request has already been cancelled', ephemeral: true});
@@ -157,13 +157,14 @@ class RideshareBot {
     }
 
     async getMessage(messageID, channelID) {
-        const channel = this.client.channels.cache.get(messageID);
-        const message = await channel.messages.fetch(channelID);
+        const channel = await this.client.channels.fetch(channelID);
+        const message = await channel.messages.fetch(messageID);
         return message;
     }
 
     async editMessage(messageID, channelID, newContent) {
-        this.getMessage(messageID, channelID).edit(newContent);
+        const message = await this.getMessage(messageID, channelID);
+        return await message.edit(newContent);
     }
 
     async sendOfferControls(userID, title) {

@@ -333,6 +333,7 @@ const submitRideEvent = async function(bot, args, res) {
     res.end(JSON.stringify({status: 'Success'}));
 
 
+
     //Get all rides from the DB
     var updateQuery = `SELECT * FROM getAllRides()`;
 	const response = await pgClient.query(updateQuery);
