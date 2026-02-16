@@ -48,13 +48,23 @@ document.getElementById("rideform").onsubmit = async function(e) {
 //         document.getElementById('categorySelect').innerHTML = html;
 // }
 
+      function noEnter(e) {
+        if(e.key == "Enter"){ //Prevent enter from toggling to next input
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
+      }
+
+
       var currentFeatures;
       async function populateSuggestions() {
-        if(document.getElementById("searchBox").value == "") {
+        var boxVal = document.getElementById("searchBox").value;
+        if(boxVal == "") {
           console.log("falling back to favorites");
           var result = await fetch("favorites.json");
         } else {
-          var result = await fetch("https://nominatim.openstreetmap.org/search?q="+event.target.value + "&format=jsonv2");
+          var result = await fetch("https://nominatim.openstreetmap.org/search?q="+ boxVal + "&format=jsonv2");
         }
         var json = await result.json();
         console.log(json);
