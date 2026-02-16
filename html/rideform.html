@@ -135,7 +135,7 @@
                     console.log(json);
                     if(json.stateValid){
                         document.getElementById("profileDisplay").src = json.user.avatar;
-                        document.getElementById("nameText").innerText = json.user.displayName + " (@" + json.user.userName + ")";
+                        document.getElementById("nameText").innerText = stopXSS(json.user.displayName) + " (@" + json.user.userName + ")";
                     } else {
                         alert("Authentication error. Please try generating a new link!");
                     }
